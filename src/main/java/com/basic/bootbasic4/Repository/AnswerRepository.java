@@ -1,4 +1,8 @@
 package com.basic.bootbasic4.Repository;
 
-public class AnswerRepository {
+import com.basic.bootbasic4.entity.Answer;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface AnswerRepository extends JpaRepository<Answer, Long> {
+
 }
