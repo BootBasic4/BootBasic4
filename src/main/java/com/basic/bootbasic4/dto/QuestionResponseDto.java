@@ -19,6 +19,7 @@ public class QuestionResponseDto {
     private String imageUrl;
     private Integer viewCount;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private String nickname; // 작성자 이름
 
 
@@ -31,6 +32,7 @@ public class QuestionResponseDto {
         this.imageUrl = question.getImageUrl();
         this.viewCount = question.getViewCount();
         this.createdAt = question.getCreatedAt();
+        this.updatedAt = question.getUpdatedAt();
 
 
         if (question.getMember() != null) {

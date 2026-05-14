@@ -20,7 +20,7 @@ public class QuestionController {
 
     private final QuestionService questionService;
 
-    // 1. 게시판별 전체 조회 (명세서: GET /questions/{category})
+    // 1. 게시판별 전체 조회 (GET /questions/{category})
     @GetMapping("/{category}")
     public String list(@PathVariable String category,
                        @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
@@ -31,7 +31,7 @@ public class QuestionController {
         return "question/list";
     }
 
-    // 2. 타입별 필터링 조회 (명세서: GET /questions/{category}/{pet_type})
+    // 2. 타입별 필터링 조회 (GET /questions/{category}/{pet_type})
     @GetMapping("/{category}/{pet_type}")
     public String filteredList(@PathVariable String category,
                                @PathVariable String pet_type,
@@ -44,7 +44,7 @@ public class QuestionController {
         return "question/list";
     }
 
-    // 3. 상세 조회 (명세서: GET /questions/{question_id})
+    // 3. 상세 조회 (GET /questions/{question_id})
     @GetMapping("/detail/{question_id}") // 명세서에는 /questions/{question_id} 이지만 1번 경로와 충돌 피하기 위해 구분 권장
     public String detail(@PathVariable("question_id") Long id, Model model) {
         QuestionResponseDto question = questionService.getQuestionDetail(id);
@@ -52,28 +52,28 @@ public class QuestionController {
         return "question/detail";
     }
 
-    // 4. 질문 등록 (명세서: POST /questions/add)
+    // 4. 질문 등록 (POST /questions/add)
     @PostMapping("/add")
-    public String write(QuestionRequestDto dto, Member member) {
-        questionService.createQuestion(dto, member);
-        return "redirect:/questions/" + dto.getCategory();
-    }
-
-    // 5. 질문 수정 (명세서: POST /questions/edit/{question_id})
-    @PostMapping("/edit/{question_id}")
-    public String edit(@PathVariable("question_id") Long id, QuestionRequestDto dto) {
-        questionService.updateQuestion(id, dto.getTitle(), dto.getContent(), dto.getCategory(), dto.getPetType());
+    public String add(QuestionRequestDto dto, Member member) {
+        Long id = questionService.addQuestion(dto, member);
         return "redirect:/questions/detail/" + id;
     }
 
-    // 6. 질문 삭제 (명세서: POST /questions/delete/{question_id})
+    // 5. 질문 수정 (POST /questions/edit/{question_id})
+    @PostMapping("/edit/{question_id}")
+    public String edit(@PathVariable("question_id") Long id, QuestionRequestDto dto) {
+        questionService.updateQuestion(id, dto);
+        return "redirect:/questions/detail/" + id;
+    }
+
+    // 6. 질문 삭제 (POST /questions/delete/{question_id})
     @PostMapping("/delete/{question_id}")
     public String delete(@PathVariable("question_id") Long id, @RequestParam String category) {
         questionService.deleteQuestion(id);
         return "redirect:/questions/" + category;
     }
 
-    // 7. 질문 통합 검색 (명세서: GET /questions/search)
+    // 7. 질문 통합 검색 (GET /questions/search)
     @GetMapping("/search")
     public String search(@RequestParam String keyword,
                          @PageableDefault(size = 10) Pageable pageable,

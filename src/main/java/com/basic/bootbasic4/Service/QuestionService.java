@@ -19,7 +19,7 @@ public class QuestionService {
 
     // 1. 게시글 등록
     @Transactional
-    public Long createQuestion(QuestionRequestDto dto, Member member) {
+    public Long addQuestion(QuestionRequestDto dto, Member member) {
         Question question = dto.toEntity();
         question.setMember(member); // 작성자 정보 연결
         return questionRepository.save(question).getId();
@@ -51,14 +51,15 @@ public class QuestionService {
 
     // 4. 게시글 수정
     @Transactional
-    public void updateQuestion(Long id, String title, String content, String category, String petType) {
+    public void updateQuestion(Long id, QuestionRequestDto dto) {
         Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + id));
 
-        question.setTitle(title);
-        question.setContent(content);
-        question.setCategory(category);
-        question.setPetType(petType);
+        question.setTitle(dto.getTitle());
+        question.setContent(dto.getContent());
+        question.setCategory(dto.getCategory());
+        question.setImageUrl(dto.getImageUrl());
+        question.setPetType(dto.getPetType());
     }
 
     // 5. 게시글 삭제
