@@ -19,7 +19,7 @@ public class MemberService {
     @Transactional
     public Member register(Member member){
         member.setPassword(passwordEncoder.encode(member.getPassword()));
-        member.setRole("USER");
+        member.setRole("ROLE_USER");
         return memberRepository.save(member);
     }
 

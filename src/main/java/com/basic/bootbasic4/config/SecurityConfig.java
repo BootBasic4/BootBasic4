@@ -31,7 +31,7 @@ public class SecurityConfig {
                         ).permitAll()
 
                         // 관리자만 접근 가능
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/**").hasRole("ROLE_ADMIN")
 
                         // 그 외 모든 요청은 로그인 필요
                         .anyRequest().authenticated()
