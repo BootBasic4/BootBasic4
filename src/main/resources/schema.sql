@@ -1,3 +1,4 @@
+DROP SCHEMA IF NOT EXISTS mnwiki;
 CREATE SCHEMA IF NOT EXISTS mnwiki;
 USE mnwiki;
 CREATE TABLE member (
