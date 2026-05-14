@@ -1,0 +1,85 @@
+package com.basic.bootbasic4.controller;
+
+
+import com.basic.bootbasic4.Service.QuestionService;
+import com.basic.bootbasic4.dto.QuestionRequestDto;
+import com.basic.bootbasic4.dto.QuestionResponseDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+@Controller
+@RequiredArgsConstructor
+@RequestMapping("/questions")
+public class QuestionController {
+
+    private final QuestionService questionService;
+
+    // 1. 게시판별 전체 조회 (명세서: GET /questions/{category})
+    @GetMapping("/{category}")
+    public String list(@PathVariable String category,
+                       @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+                       Model model) {
+        Page<QuestionResponseDto> list = questionService.getListByCategory(category, "ALL", pageable);
+        model.addAttribute("questions", list);
+        model.addAttribute("category", category);
+        return "question/list";
+    }
+
+    // 2. 타입별 필터링 조회 (명세서: GET /questions/{category}/{pet_type})
+    @GetMapping("/{category}/{pet_type}")
+    public String filteredList(@PathVariable String category,
+                               @PathVariable String pet_type,
+                               @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+                               Model model) {
+        Page<QuestionResponseDto> list = questionService.getListByCategory(category, pet_type, pageable);
+        model.addAttribute("questions", list);
+        model.addAttribute("category", category);
+        model.addAttribute("petType", pet_type);
+        return "question/list";
+    }
+
+    // 3. 상세 조회 (명세서: GET /questions/{question_id})
+    @GetMapping("/detail/{question_id}") // 명세서에는 /questions/{question_id} 이지만 1번 경로와 충돌 피하기 위해 구분 권장
+    public String detail(@PathVariable("question_id") Long id, Model model) {
+        QuestionResponseDto question = questionService.getQuestionDetail(id);
+        model.addAttribute("question", question);
+        return "question/detail";
+    }
+
+    // 4. 질문 등록 (명세서: POST /questions/add)
+    @PostMapping("/add")
+    public String write(QuestionRequestDto dto, Member member) {
+        questionService.createQuestion(dto, member);
+        return "redirect:/questions/" + dto.getCategory();
+    }
+
+    // 5. 질문 수정 (명세서: POST /questions/edit/{question_id})
+    @PostMapping("/edit/{question_id}")
+    public String edit(@PathVariable("question_id") Long id, QuestionRequestDto dto) {
+        questionService.updateQuestion(id, dto.getTitle(), dto.getContent(), dto.getCategory(), dto.getPetType());
+        return "redirect:/questions/detail/" + id;
+    }
+
+    // 6. 질문 삭제 (명세서: POST /questions/delete/{question_id})
+    @PostMapping("/delete/{question_id}")
+    public String delete(@PathVariable("question_id") Long id, @RequestParam String category) {
+        questionService.deleteQuestion(id);
+        return "redirect:/questions/" + category;
+    }
+
+    // 7. 질문 통합 검색 (명세서: GET /questions/search)
+    @GetMapping("/search")
+    public String search(@RequestParam String keyword,
+                         @PageableDefault(size = 10) Pageable pageable,
+                         Model model) {
+        Page<QuestionResponseDto> searchList = questionService.searchAll(keyword, pageable);
+        model.addAttribute("questions", searchList);
+        return "question/list";
+    }
+}
