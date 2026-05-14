@@ -76,13 +76,13 @@ public class ReportService {
         reportRepository.save(report);
     }
 
-    // 3. 전체 신고 목록 조회 - 관리자
+    // 3. 전체 신고 목록 조회
     @Transactional(readOnly = true)
     public List<Report> getAllReports(){
         return reportRepository.findAllByOrderByCreatedAtDesc();
     }
 
-    // 4. 처리 대기 신고 목록 조회 - 관리자
+    // 4. 처리 대기 신고 목록 조회
     @Transactional(readOnly = true)
     public List<Report> getPendingReports(){
         return reportRepository.findByStatusOrderByCreatedAtDesc("PENDING");
@@ -95,16 +95,22 @@ public class ReportService {
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new RuntimeException("신고 내역을 찾을 수 없습니다."));
 
-        report.setStatus("APPROVED");
+        report.setStatus("DELETED");
 
         // 질문 신고일 경우
         if(report.getQuestion() != null){
-            questionRepository.delete(report.getQuestion());
+            Question question = report.getQuestion();
+
+            report.setQuestion(null); // FK 연결 끊기
+            questionRepository.delete(question);
         }
 
         // 답변 신고일 경우
         if (report.getAnswer() != null) {
-            answerRepository.delete(report.getAnswer());
+            Answer answer = report.getAnswer();
+
+            report.setAnswer(null); // FK 연결 끊기
+            answerRepository.delete(answer);
         }
     }
 

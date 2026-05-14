@@ -1,13 +1,11 @@
 package com.basic.bootbasic4.Service;
 
 import com.basic.bootbasic4.Repository.MemberRepository;
+import com.basic.bootbasic4.entity.Member;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.basic.bootbasic4.entity.Member;
 
 @Service
 @RequiredArgsConstructor
