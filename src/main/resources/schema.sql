@@ -22,6 +22,7 @@ CREATE TABLE question (
                           content     TEXT         NOT NULL COMMENT '내용',
                           member_id   BIGINT       NOT NULL COMMENT '작성자(FK)',
                           category    VARCHAR(20)  NOT NULL DEFAULT 'QUESTION' COMMENT '게시판 구분(QUESTION, TIP, FREE 등)',
+                          pet_type     VARCHAR(20)  NOT NULL DEFAULT 'ALL' COMMENT '동물 타입',
                           image_url   VARCHAR(500) NULL     COMMENT '이미지 경로',
                           view_count  INT          NOT NULL DEFAULT 0 COMMENT '조회수',
                           created_at  DATETIME     NOT NULL COMMENT '작성일시',
