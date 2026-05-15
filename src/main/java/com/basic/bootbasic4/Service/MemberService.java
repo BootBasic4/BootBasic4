@@ -43,4 +43,19 @@ public class MemberService implements UserDetailsService {
                 .build();
     }
 
+    // 중복확인 - 아이디(로그인용)
+    public boolean existsByUsername(String username) {
+        return memberRepository.existsByUsername(username);
+    }
+
+    // 중복확인 - 닉네임
+    public boolean existsByNickname(String nickname) {
+        return memberRepository.existsByNickname(nickname);
+    }
+
+    // 중복확인 - 이메일
+    public boolean existsByEmail(String email) {
+        return memberRepository.existsByEmail(email);
+    }
+
 }

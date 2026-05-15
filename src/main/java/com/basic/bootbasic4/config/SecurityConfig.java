@@ -22,6 +22,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/",
                                 "/index",
+                                "/check-username",
+                                "/check-nickname",
+                                "/check-email",
                                 "/signup",
                                 "/login",
                                 "/questions",
@@ -42,7 +45,7 @@ public class SecurityConfig {
                 .formLogin(login -> login
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/index", true)
+                        .defaultSuccessUrl("/", true)
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
@@ -50,7 +53,7 @@ public class SecurityConfig {
                 // 로그아웃 설정
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login")
+                        .logoutSuccessUrl("/")
                         .permitAll()
                 );
 
