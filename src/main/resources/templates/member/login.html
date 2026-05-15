@@ -11,13 +11,9 @@
 <body class="bg-light">
 
 <div class="container">
-
     <div class="row justify-content-center align-items-center vh-100">
-
         <div class="col-md-4">
-
             <div class="card shadow-sm p-4">
-
                 <h2 class="text-center mb-4">로그인</h2>
 
                 <!-- 로그인 실패 메시지 -->
@@ -33,10 +29,8 @@
                 </div>
 
                 <form th:action="@{/login}" method="post">
-
                     <div class="mb-3">
                         <label class="form-label">아이디</label>
-
                         <input type="text"
                                name="username"
                                class="form-control"
@@ -45,7 +39,6 @@
 
                     <div class="mb-4">
                         <label class="form-label">비밀번호</label>
-
                         <input type="password"
                                name="password"
                                class="form-control"
@@ -53,16 +46,10 @@
                     </div>
 
                     <div class="d-grid gap-2">
-
-                        <button type="submit"
-                                class="btn btn-success">
-                            로그인
-                        </button>
-
-                        <a href="/signup"
-                           class="btn btn-outline-secondary">
-                            회원가입
-                        </a>
+                        <button type="submit" class="btn btn-success"> 로그인 </button>
+                            <a href="/signup" class="btn btn-outline-secondary">
+                                회원가입
+                            </a>
 
                     </div>
 
