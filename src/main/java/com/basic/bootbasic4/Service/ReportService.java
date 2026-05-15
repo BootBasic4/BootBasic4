@@ -28,9 +28,9 @@ public class ReportService {
                 .orElseThrow(() -> new RuntimeException("질문글을 찾을 수 없습니다."));
 
         boolean alreadyReported =
-                reportRepository.existsByReporterMemberIdAndQuestionQuestionId(
+                reportRepository.existsByReporterMemberIdAndQuestionId(
                         member.getMemberId(),
-                        question.getQuestionId()
+                        question.getId()
                 );
 
         if (alreadyReported) {
