@@ -24,7 +24,7 @@ public class MyPageController {
         String username = authentication.getName();
         Member member = myPageService.getMyInfo(username);
         model.addAttribute("member", member);
-        return "mypage";
+        return "member/mypage";
     }
 
     // 2. 닉네임 수정

@@ -40,14 +40,14 @@ public class ReportController {
     @GetMapping("/admin/reports")
     public String getAllReports(Model model) {
         model.addAttribute("reports", reportService.getAllReports());
-        return "report";
+        return "member/report";
     }
 
     // 4. 처리 대기 신고 목록 조회
     @GetMapping("/admin/reports/pending")
     public String getPendingReports(Model model) {
         model.addAttribute("reports", reportService.getPendingReports());
-        return "report";
+        return "member/report";
     }
 
     // 5. 신고 승인 처리

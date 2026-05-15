@@ -20,7 +20,7 @@ public class MemberController {
     @GetMapping("/signup")
     public String signupForm(Model model) {
         model.addAttribute("memberFormDto", new MemberFormDto());
-        return "signup";
+        return "member/signup";
     }
 
     // 회원가입 처리
@@ -40,7 +40,7 @@ public class MemberController {
     // 로그인 페이지
     @GetMapping("/login")
     public String loginForm() {
-        return "login";
+        return "member/login";
     }
 
 }
