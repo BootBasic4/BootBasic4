@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Error 403</title>
+</head>
+<body>
+    <div class="error-container">
+        <h2>🐾 접근 권한이 없어요</h2>
+        <p th:text="${errorMessage}"></p>
+        <small th:text="'오류 코드: ' + ${errorCode}"></small>
+        <a href="/questions">질문 목록으로 돌아가기</a>
+    </div>
+</body>
+</html>
