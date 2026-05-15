@@ -45,7 +45,7 @@ public class QuestionController {
     }
 
     // 3. 상세 조회 (GET /questions/{question_id})
-    @GetMapping("/detail/{question_id}") // 명세서에는 /questions/{question_id} 이지만 1번 경로와 충돌 피하기 위해 구분 권장
+    @GetMapping("/detail/{question_id}")
     public String detail(@PathVariable("question_id") Long id, Model model) {
         QuestionResponseDto question = questionService.getQuestionDetail(id);
         model.addAttribute("question", question);
