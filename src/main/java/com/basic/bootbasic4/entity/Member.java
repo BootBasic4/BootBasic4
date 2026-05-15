@@ -1,19 +1,20 @@
 package com.basic.bootbasic4.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "member")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class Member {
 
     @Id
@@ -34,7 +35,7 @@ public class Member {
     private String email;
 
     @Column(nullable = false, length = 20)
-    private String role;
+    private String role = "ROLE_USER";
 
     @Column(name = "pet_type", length = 50)
     private String petType;
@@ -42,11 +43,7 @@ public class Member {
     @Column(name = "pet_started")
     private Integer petStarted;
 
-    @Column(name = "created_at")
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
-    }
 }
