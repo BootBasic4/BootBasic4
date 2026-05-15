@@ -4,6 +4,8 @@ import com.basic.bootbasic4.Repository.QuestionRepository;
 import com.basic.bootbasic4.dto.QuestionRequestDto;
 import com.basic.bootbasic4.dto.QuestionResponseDto;
 import com.basic.bootbasic4.entity.Question;
+import com.basic.bootbasic4.entity.QuestionCategory;
+import com.basic.bootbasic4.entity.QuestionPetType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,13 +31,17 @@ public class QuestionService {
     public Page<QuestionResponseDto> getListByCategory(String category, String petType, Pageable pageable) {
         Page<Question> questions;
 
+        QuestionCategory categoryEnum = QuestionCategory.valueOf(category.toUpperCase());
+        QuestionPetType petTypeEnum = QuestionPetType.valueOf(petType.toUpperCase());
+
         if (petType == null || petType.equalsIgnoreCase("ALL")) {
-            questions = questionRepository.findByCategory(category, pageable);
+            questions = questionRepository.findByCategory(categoryEnum, pageable);
         } else {
-            questions = questionRepository.findByCategoryAndPetType(category, petType, pageable);
+
+            questions = questionRepository.findByCategoryAndPetType(categoryEnum, petTypeEnum, pageable);
         }
 
-        return questions.map(QuestionResponseDto::new);
+        return questions.map(QuestionResponseDto::from);
     }
 
     // 3. 상세 조회
@@ -46,7 +52,7 @@ public class QuestionService {
 
         question.setViewCount(question.getViewCount() + 1);
 
-        return new QuestionResponseDto(question);
+        return QuestionResponseDto.from(question);
     }
 
     // 4. 게시글 수정
@@ -74,7 +80,7 @@ public class QuestionService {
     // 6. 통합 검색 (제목 + 내용)
     public Page<QuestionResponseDto> searchAll(String keyword, Pageable pageable) {
         return questionRepository.findByTitleContainingOrContentContaining(keyword, keyword, pageable)
-                .map(QuestionResponseDto::new);
+                .map(QuestionResponseDto::from);
     }
 
 }

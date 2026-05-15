@@ -30,11 +30,13 @@ public class Question {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(nullable = false, length = 20, columnDefinition = "VARCHAR(20) DEFAULT 'QUESTION'")
-    private String category;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private QuestionCategory category;
 
-    @Column(name = "pet_type", nullable = false, length = 20)
-    private String petType;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private QuestionPetType petType;
 
     @Column(name = "image_url", length = 500)
     private String imageUrl;

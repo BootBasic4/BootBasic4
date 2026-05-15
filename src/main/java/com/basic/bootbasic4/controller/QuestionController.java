@@ -4,6 +4,7 @@ package com.basic.bootbasic4.controller;
 import com.basic.bootbasic4.Service.QuestionService;
 import com.basic.bootbasic4.dto.QuestionRequestDto;
 import com.basic.bootbasic4.dto.QuestionResponseDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -54,14 +56,33 @@ public class QuestionController {
 
     // 4. 질문 등록 (POST /questions/add)
     @PostMapping("/add")
-    public String add(QuestionRequestDto dto, Member member) {
+    public String add(@Valid @ModelAttribute("dto") QuestionRequestDto dto,
+                      BindingResult bindingResult,
+                      Member member,
+                      Model model) {
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("category", dto.getCategory());
+            return "question/question_Form";
+        }
+
         Long id = questionService.addQuestion(dto, member);
         return "redirect:/questions/detail/" + id;
     }
 
     // 5. 질문 수정 (POST /questions/edit/{question_id})
     @PostMapping("/edit/{question_id}")
-    public String edit(@PathVariable("question_id") Long id, QuestionRequestDto dto) {
+    public String edit(@PathVariable("question_id") Long id,
+                       @Valid @ModelAttribute("dto") QuestionRequestDto dto,
+                       BindingResult bindingResult,
+                       Model model) {
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("questionId", id);
+            model.addAttribute("category", dto.getCategory());
+            return "question/question_form";
+        }
+
         questionService.updateQuestion(id, dto);
         return "redirect:/questions/detail/" + id;
     }
