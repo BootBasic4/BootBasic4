@@ -1,24 +1,56 @@
 package com.basic.bootbasic4.Service;
 
-import com.basic.bootbasic4.Repository.MemberRepository;
-import com.basic.bootbasic4.entity.Member;
+import com.basic.bootbasic4.Repository.*;
+import com.basic.bootbasic4.entity.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class MyPageService {
 
     private final MemberRepository memberRepository;
+    private final QuestionRepository questionRepository;
+    private final AnswerRepository answerRepository;
     private final PasswordEncoder passwordEncoder;
 
     // 1. 내 정보 조회
-    @Transactional
+    @Transactional(readOnly = true)
     public Member getMyInfo(String username){
         return memberRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("회원정보를 찾을 수 없습니다."));
+    }
+
+    // 1-1. 내가 작성한 질문 개수
+    @Transactional(readOnly = true)
+    public long getMyQuestionCount(String username) {
+        Member member = getMyInfo(username);
+        return questionRepository.countByMember(member);
+    }
+
+    // 1-2. 내가 작성한 답변 개수
+    @Transactional(readOnly = true)
+    public long getMyAnswerCount(String username) {
+        Member member = getMyInfo(username);
+        return answerRepository.countByMember(member);
+    }
+
+    // 1-3. 내가 작성한 질문 목록
+    @Transactional(readOnly = true)
+    public List<Question> getMyQuestions(String username) {
+        Member member = getMyInfo(username);
+        return questionRepository.findByMemberOrderByCreatedAtDesc(member);
+    }
+
+    // 1-4. 내가 작성한 답변 목록
+    @Transactional(readOnly = true)
+    public List<Answer> getMyAnswers(String username) {
+        Member member = getMyInfo(username);
+        return answerRepository.findByMemberOrderByCreatedAtDesc(member);
     }
 
     // 2. 내 정보 수정
