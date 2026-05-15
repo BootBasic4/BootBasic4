@@ -43,6 +43,7 @@ public class SecurityConfig {
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
                         .defaultSuccessUrl("/index", true)
+                        .failureUrl("/login?error=true")
                         .permitAll()
                 )
 
