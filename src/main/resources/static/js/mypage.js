@@ -100,18 +100,54 @@ function checkMypageNickname() {
 }
 
 
-// 닉네임 수정 최종 검사
-function validateNicknameUpdateForm() {
+// 닉네임 형식 검사
+function validateMypageNickname() {
 
-    if (!validateMypageNickname()) {
+    const nickname = document.getElementById("mypageNickname").value.trim();
+
+    const result = document.getElementById("mypageNicknameResult");
+
+    // 한글, 영어, 숫자, _ 허용
+    const regex = /^[가-힣a-zA-Z0-9_]+$/;
+
+    // 입력 여부 검사
+    if (nickname.length === 0) {
+
+        result.innerText = "";
+        result.className = "small mt-2";
+
         return false;
     }
 
-    if (!isMypageNicknameChecked) {
+    // 허용 문자 검사
+    if (!regex.test(nickname)) {
 
-        alert("닉네임 중복확인을 해주세요.");
+        result.innerText =
+            "한글, 영어, 숫자, _(언더바)만 사용 가능합니다.";
+
+        result.className = "small mt-2 text-danger";
+
+        isMypageNicknameChecked = false;
+
         return false;
     }
+
+    // 길이 검사
+    if (nickname.length < 2 || nickname.length > 20) {
+
+        result.innerText =
+            "2~20글자 이내만 사용 가능합니다.";
+
+        result.className = "small mt-2 text-danger";
+
+        isMypageNicknameChecked = false;
+
+        return false;
+    }
+
+    // 성공 시 메시지 초기화
+    result.innerText = "";
+    result.className = "small mt-2";
 
     return true;
 }
@@ -310,6 +346,19 @@ function validateMypagePassword() {
     return isCombinationValid && isLengthValid && isRepeatValid;
 }
 
+// 비밀번호 보기 / 숨기기
+function togglePassword(inputId, button) {
+    const input = document.getElementById(inputId);
+    const icon = button.querySelector("i");
+
+    if (input.type === "password") {
+        input.type = "text";
+        icon.className = "bi bi-eye";
+    } else {
+        input.type = "password";
+        icon.className = "bi bi-eye-slash";
+    }
+}
 
 // 새 비밀번호 일치 검사
 function checkMypagePasswordMatch() {
@@ -317,7 +366,8 @@ function checkMypagePasswordMatch() {
     const password = document.getElementById("newPassword").value;
     const confirmPassword = document.getElementById("confirmNewPassword").value;
 
-    const result = document.getElementById("passwordModalResult");
+    const result = document.getElementById("currentPasswordResult");
+    const successResult = document.getElementById("passwordModalResult");
 
     if (confirmPassword.length === 0) {
 
@@ -348,7 +398,8 @@ function validatePasswordModal() {
     const currentPassword =
         document.querySelector("input[name='currentPassword']").value;
 
-    const result = document.getElementById("passwordModalResult");
+    const currentPasswordResult = document.getElementById("currentPasswordResult");
+    const passwordModalResult = document.getElementById("passwordModalResult");
 
     // 현재 비밀번호 입력 여부
     if (currentPassword.trim().length === 0) {
@@ -377,5 +428,37 @@ function validatePasswordModal() {
         return false;
     }
 
-    return true;
+    // form 가져오기
+    const form = document.getElementById("passwordForm");
+
+    // formData 생성
+    const formData = new FormData(form);
+
+    // fetch 요청
+    fetch("/mypage/password", {
+        method: "POST",
+        body: formData
+    })
+
+        .then(async response => {
+
+            const message = await response.text();
+
+            if (response.ok) {
+
+                currentPasswordResult.innerText = "";
+                passwordModalResult.innerText = "비밀번호가 변경되었습니다.";
+                passwordModalResult.className = "small text-success mt-1";
+
+            } else {
+
+                currentPasswordResult.innerText = message;
+                currentPasswordResult.className = "small text-danger mt-1";
+
+                passwordModalResult.innerText = "";
+            }
+        });
+
+    // 기본 submit 막기
+    return false;
 }

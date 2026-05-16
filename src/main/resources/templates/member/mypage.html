@@ -361,27 +361,51 @@
                         data-bs-dismiss="modal"></button>
             </div>
 
-            <form th:action="@{/mypage/password}"
-                  method="post"
+            <form id="passwordForm"
                   onsubmit="return validatePasswordModal()">
 
                 <div class="modal-body">
 
-                    <input type="password"
-                           name="currentPassword"
-                           class="form-control mb-2"
-                           placeholder="현재 비밀번호"
-                           required>
+                    <!-- 현재 비밀번호 -->
+                    <div class="input-group mb-2">
+                        <input type="password"
+                               name="currentPassword"
+                               id="currentPassword"
+                               class="form-control"
+                               placeholder="현재 비밀번호"
+                               required>
 
-                    <input type="password"
-                           id="newPassword"
-                           name="newPassword"
-                           class="form-control mb-2"
-                           placeholder="새 비밀번호"
-                           onfocus="showPasswordRuleBox()"
-                           oninput="validateMypagePassword()"
-                           required>
+                        <button type="button"
+                                class="btn btn-light border"
+                                onclick="togglePassword('currentPassword', this)">
+                            <i class="bi bi-eye-slash"></i>
+                        </button>
+                    </div>
 
+                    <div id="currentPasswordResult"
+                         class="small text-danger mt-1 mb-2"></div>
+
+
+                    <!-- 새 비밀번호 -->
+                    <div class="input-group mb-2">
+                        <input type="password"
+                               id="newPassword"
+                               name="newPassword"
+                               class="form-control"
+                               placeholder="새 비밀번호"
+                               onfocus="showPasswordRuleBox()"
+                               oninput="validateMypagePassword()"
+                               required>
+
+                        <button type="button"
+                                class="btn btn-light border"
+                                onclick="togglePassword('newPassword', this)">
+                            <i class="bi bi-eye-slash"></i>
+                        </button>
+                    </div>
+
+
+                    <!-- 비밀번호 조건 박스 -->
                     <div id="passwordRuleBox"
                          class="border rounded-3 p-3 mb-2 bg-light"
                          style="display:none;">
@@ -402,15 +426,28 @@
                         </div>
                     </div>
 
-                    <input type="password"
-                           id="confirmNewPassword"
-                           class="form-control mb-2"
-                           placeholder="새 비밀번호 확인"
-                           oninput="checkMypagePasswordMatch()"
-                           required>
+
+                    <!-- 새 비밀번호 확인 -->
+                    <div class="input-group mb-2">
+                        <input type="password"
+                               id="confirmNewPassword"
+                               class="form-control"
+                               placeholder="새 비밀번호 확인"
+                               oninput="checkMypagePasswordMatch()"
+                               required>
+
+                        <button type="button"
+                                class="btn btn-light border"
+                                onclick="togglePassword('confirmNewPassword', this)">
+                            <i class="bi bi-eye-slash"></i>
+                        </button>
+                    </div>
+
+                    <div id="passwordMatchResult"
+                         class="small text-danger mt-1 mb-2"></div>
 
                     <div id="passwordModalResult"
-                         class="small text-secondary  mt-1"></div>
+                         class="small text-secondary mt-1"></div>
 
                 </div>
 

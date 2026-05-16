@@ -29,7 +29,7 @@
 <div class="container min-vh-100 d-flex justify-content-center align-items-center">
     <div style="width: 100%; max-width: 350px;">
 
-        <h1 class="text-center fw-bold mb-4">회원가입</h1>
+        <h1 class="text-center fw-bold mb-5">회원가입</h1>
 
         <form th:action="@{/signup}" method="post" th:object="${memberFormDto}" onsubmit="return validateSignupForm()">
 
@@ -39,22 +39,22 @@
 
                 <div class="d-flex gap-2">
                     <input type="text"
+                           class="form-control"
                            id="username"
-                           th:field="*{username}"
-                           class="form-control rounded-3 py-2"
-                           style="flex:1;"
-                           placeholder="아이디를 입력하세요"
-                           oninput="resetUsernameCheck()"
-                           required>
+                           name="username"
+                           placeholder="아이디 입력"
+                           style="height:42px;"
+                           oninput="resetUsernameCheck(); validateUsername()">
 
                     <button type="button"
-                            class="btn btn-sm fw-semibold rounded-3 px-2"
-                            style="width:82px; background-color:#e9ecef; border:none; font-size:14px;"
+                            class="btn btn-sm fw-semibold rounded-3"
+                            style="width:92px; height:42px; background-color:#e9ecef; border:none; font-size:14px;"
                             onclick="checkUsername()">
                         중복확인
                     </button>
                 </div>
 
+                <div id="usernameRuleText" class="small mt-1"></div>
                 <div id="usernameCheckResult" class="small mt-1"></div>
             </div>
 
@@ -129,19 +129,16 @@
 
                 <div class="d-flex gap-2">
                     <input type="text"
+                           class="form-control"
                            id="nickname"
-                           th:field="*{nickname}"
-                           class="form-control rounded-3 py-2"
-                           style="flex:1;"
-                           placeholder="닉네임을 입력하세요"
-                           minlength="2"
-                           maxlength="20"
-                           oninput="validateNickname(); resetNicknameCheck()"
-                           required>
+                           name="nickname"
+                           placeholder="닉네임 입력"
+                           style="height:42px;"
+                           oninput="resetNicknameCheck(); validateNickname()">
 
                     <button type="button"
-                            class="btn btn-sm fw-semibold rounded-3 px-2"
-                            style="width:82px; background-color:#e9ecef; border:none; font-size:14px;"
+                            class="btn btn-sm fw-semibold rounded-3"
+                            style="width:92px; height:42px; background-color:#e9ecef; border:none; font-size:14px;"
                             onclick="checkNickname()">
                         중복확인
                     </button>
@@ -244,7 +241,7 @@
             </button>
 
             <!-- 로그인 이동 -->
-            <div class="text-center mt-4">
+            <div class="text-center mt-4 mb-4">
                 이미 계정이 있으신가요?
                 <a href="/login"
                    class="text-decoration-none fw-semibold"

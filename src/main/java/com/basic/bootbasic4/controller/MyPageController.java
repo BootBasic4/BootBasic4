@@ -6,12 +6,15 @@ import com.basic.bootbasic4.dto.MyPageFormDto;
 import com.basic.bootbasic4.entity.Member;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 
@@ -94,15 +97,24 @@ public class MyPageController {
 
     // 3. 비밀번호 변경
     @PostMapping("/mypage/password")
-    public String updatePassword(Authentication authentication, @ModelAttribute MyPageFormDto dto) {
-        String username = authentication.getName();
-        myPageService.updatePassword(
-                username,
-                dto.getCurrentPassword(),
-                dto.getNewPassword()
-        );
+    @ResponseBody
+    public ResponseEntity<String> updatePassword(
+            Authentication authentication,
+            @ModelAttribute MyPageFormDto dto) {
 
-        return "redirect:/mypage";
+        String username = authentication.getName();
+
+        try {
+            myPageService.updatePassword(
+                    username,
+                    dto.getCurrentPassword(),
+                    dto.getNewPassword()
+            );
+            return ResponseEntity.ok("success");
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     // 4. 회원 탈퇴
