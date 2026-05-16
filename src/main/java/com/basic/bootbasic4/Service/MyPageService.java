@@ -54,19 +54,45 @@ public class MyPageService {
     }
 
     // 2. 내 정보 수정
+    // 2. 내 정보 수정
     @Transactional
     public Member updateMyInfo(String username, Member updateMember){
         Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("회원정보를 찾을 수 없습니다."));
+                .orElseThrow(() ->
+                        new RuntimeException("회원정보를 찾을 수 없습니다."));
 
+        // 닉네임 중복 검사
         if (updateMember.getNickname() != null) {
+            Member existingNicknameMember =
+                    memberRepository.findByNickname(updateMember.getNickname())
+                            .orElse(null);
+
+            // 자기 자신 제외 중복 검사
+            if (existingNicknameMember != null
+                    && !existingNicknameMember.getMemberId()
+                    .equals(member.getMemberId())) {
+                throw new IllegalArgumentException(
+                        "이미 사용 중인 닉네임입니다.");
+            }
             member.setNickname(updateMember.getNickname());
         }
 
+        // 이메일 중복 검사
         if (updateMember.getEmail() != null) {
+            Member existingEmailMember =
+                    memberRepository.findByEmail(updateMember.getEmail())
+                            .orElse(null);
+
+            // 자기 자신 제외 중복 검사
+            if (existingEmailMember != null
+                    && !existingEmailMember.getMemberId()
+                    .equals(member.getMemberId())) {
+                throw new IllegalArgumentException(
+                        "이미 사용 중인 이메일입니다.");
+            }
+
             member.setEmail(updateMember.getEmail());
         }
-
         return member;
     }
 
@@ -85,10 +111,14 @@ public class MyPageService {
 
     // 4. 회원탈퇴
     @Transactional
-    public void deleteMember(String username){
+    public void deleteMember(String username, String currentPassword) {
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("회원정보를 찾을 수 없습니다."));
 
+        // 입력한 비밀번호와 DB 암호화 비밀번호 비교
+        if (!passwordEncoder.matches(currentPassword, member.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
         memberRepository.delete(member);
     }
 

@@ -89,7 +89,6 @@ public class MemberController {
         }
 
         int count = 0;
-
         // 영문 포함 여부
         if (password.matches(".*[A-Za-z].*")) {
             count++;
@@ -108,6 +107,7 @@ public class MemberController {
         // 영문/숫자/특수문자 중 2가지 이상 포함
         return count >= 2;
     }
+
     // 로그인 페이지
     @GetMapping("/login")
     public String loginForm() {

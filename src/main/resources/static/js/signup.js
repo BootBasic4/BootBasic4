@@ -239,7 +239,6 @@ function validateNickname() {
 
     // 허용 문자 검사
     if (!regex.test(nickname)) {
-
         setMessage(
             ruleText,
             "한글, 영어, 숫자, _(언더바)만 사용 가능합니다.",
@@ -252,7 +251,6 @@ function validateNickname() {
 
     // 길이 검사
     if (nickname.length < 2 || nickname.length > 20) {
-
         setMessage(
             ruleText,
             "2~20글자 이내만 사용 가능합니다.",

@@ -10,8 +10,6 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     // 전체 신고 목록
     List<Report> findAllByOrderByCreatedAtDesc();
 
-    // 미처리 신고 목록
-    List<Report> findByStatusOrderByCreatedAtDesc(String status);
 
     // 질문 중복 신고 체크
     boolean existsByReporterMemberIdAndQuestionId(

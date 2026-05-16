@@ -211,7 +211,8 @@
 
 <!-- 닉네임 수정 모달 -->
 <div class="modal fade" id="nicknameModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered"
+         style="max-width: 400px">
         <div class="modal-content rounded-4 border-0">
 
             <div class="modal-header border-0 pb-0">
@@ -234,13 +235,14 @@
                                id="mypageNickname"
                                name="nickname"
                                class="form-control rounded-3"
+                               style="max-width: 290px"
                                th:value="${member.nickname}"
                                placeholder="2~20자 닉네임"
                                oninput="resetMypageNicknameCheck()"
                                required>
 
                         <button type="button"
-                                class="btn btn-outline-secondary rounded-3 px-3"
+                                class="btn btn-link text-dark text-decoration-none p-0 fw-semibold"
                                 style="white-space:nowrap;"
                                 onclick="checkMypageNickname()">
                             중복확인
@@ -262,13 +264,13 @@
 
                 <div class="modal-footer border-0 pt-0">
                     <button type="button"
-                            class="btn btn-light rounded-3 px-4"
+                            class="btn btn-link text-dark text-decoration-none fw-semibold"
                             data-bs-dismiss="modal">
                         취소
                     </button>
 
                     <button type="submit"
-                            class="btn btn-dark rounded-3 px-4">
+                            class="btn btn-link text-danger text-decoration-none fw-semibold">
                         변경하기
                     </button>
                 </div>
@@ -281,7 +283,8 @@
 
 <!-- 이메일 수정 모달 -->
 <div class="modal fade" id="emailModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered"
+         style="max-width: 400px">
         <div class="modal-content rounded-4 border-0">
 
             <div class="modal-header border-0 pb-0">
@@ -304,13 +307,14 @@
                                id="mypageEmail"
                                name="email"
                                class="form-control rounded-3"
+                               style="max-width: 290px"
                                th:value="${member.email}"
                                placeholder="example@test.com"
                                oninput="resetMypageEmailCheck()"
                                required>
 
                         <button type="button"
-                                class="btn btn-outline-secondary rounded-3 px-3"
+                                class="btn btn-link text-dark text-decoration-none p-0 fw-semibold"
                                 style="white-space:nowrap;"
                                 onclick="checkMypageEmail()">
                             중복확인
@@ -332,13 +336,13 @@
 
                 <div class="modal-footer border-0 pt-0">
                     <button type="button"
-                            class="btn btn-light rounded-3 px-4"
+                            class="btn btn-link text-dark text-decoration-none p-0 fw-semibold"
                             data-bs-dismiss="modal">
                         취소
                     </button>
 
                     <button type="submit"
-                            class="btn btn-dark rounded-3 px-4">
+                            class="btn btn-link text-danger text-decoration-none p-0 fw-semibold">
                         변경하기
                     </button>
                 </div>
@@ -351,10 +355,11 @@
 
 <!-- 비밀번호 변경 모달 -->
 <div class="modal fade" id="passwordModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered"
+         style="max-width: 400px">
         <div class="modal-content rounded-4 border-0">
 
-            <div class="modal-header">
+            <div class="modal-header border-0">
                 <h5 class="modal-title fw-bold">비밀번호 변경</h5>
                 <button type="button"
                         class="btn-close"
@@ -372,6 +377,7 @@
                                name="currentPassword"
                                id="currentPassword"
                                class="form-control"
+                               style="max-width: 290px"
                                placeholder="현재 비밀번호"
                                required>
 
@@ -392,6 +398,7 @@
                                id="newPassword"
                                name="newPassword"
                                class="form-control"
+                               style="max-width: 290px"
                                placeholder="새 비밀번호"
                                onfocus="showPasswordRuleBox()"
                                oninput="validateMypagePassword()"
@@ -408,7 +415,7 @@
                     <!-- 비밀번호 조건 박스 -->
                     <div id="passwordRuleBox"
                          class="border rounded-3 p-3 mb-2 bg-light"
-                         style="display:none;">
+                         style="max-width:330px; display:none; font-size: 15px">
 
                         <div id="rule-combination"
                              class="text-danger mb-1">
@@ -432,6 +439,7 @@
                         <input type="password"
                                id="confirmNewPassword"
                                class="form-control"
+                               style="max-width: 290px"
                                placeholder="새 비밀번호 확인"
                                oninput="checkMypagePasswordMatch()"
                                required>
@@ -451,15 +459,15 @@
 
                 </div>
 
-                <div class="modal-footer">
+                <div class="modal-footer border-0">
                     <button type="button"
-                            class="btn btn-light rounded-3"
+                            class="btn btn-link text-dark text-decoration-none p-0 fw-semibold"
                             data-bs-dismiss="modal">
                         취소
                     </button>
 
                     <button type="submit"
-                            class="btn btn-dark rounded-3">
+                            class="btn btn-link text-danger text-decoration-none p-0 fw-semibold">
                         변경하기
                     </button>
                 </div>
@@ -472,19 +480,18 @@
 
 <!-- 회원 탈퇴 모달 -->
 <div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered"
+         style="max-width: 400px">
         <div class="modal-content rounded-4 border-0">
 
-            <div class="modal-header">
+            <div class="modal-header border-0">
                 <h5 class="modal-title fw-bold text-danger">회원 탈퇴</h5>
                 <button type="button"
                         class="btn-close"
                         data-bs-dismiss="modal"></button>
             </div>
 
-            <form th:action="@{/mypage/delete}"
-                  method="post"
-                  onsubmit="return confirm('정말 회원 탈퇴하시겠습니까?');">
+            <form onsubmit="return deleteMember(event)">
 
                 <div class="modal-body">
 
@@ -493,22 +500,27 @@
                     </p>
 
                     <input type="password"
+                           id="deleteCurrentPassword"
                            name="currentPassword"
                            class="form-control"
+                           style="max-width: 290px"
                            placeholder="비밀번호"
                            required>
 
+                    <div id="deleteResult"
+                         class="small mt-2"></div>
+
                 </div>
 
-                <div class="modal-footer">
+                <div class="modal-footer border-0">
                     <button type="button"
-                            class="btn btn-light rounded-3"
+                            class="btn btn-link text-dark text-decoration-none p-0 fw-semibold"
                             data-bs-dismiss="modal">
                         취소
                     </button>
 
                     <button type="submit"
-                            class="btn btn-outline-danger rounded-3">
+                            class="btn btn-link text-danger text-decoration-none p-0 fw-semibold">
                         탈퇴하기
                     </button>
                 </div>

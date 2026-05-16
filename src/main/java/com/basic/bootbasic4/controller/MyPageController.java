@@ -8,12 +8,10 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
@@ -119,12 +117,27 @@ public class MyPageController {
 
     // 4. 회원 탈퇴
     @PostMapping("/mypage/delete")
-    public String deleteMember(Authentication authentication, HttpSession session) {
+    @ResponseBody
+    public String deleteMember(Authentication authentication,
+                               @RequestParam String currentPassword,
+                               HttpSession session) {
+
         String username = authentication.getName();
-        myPageService.deleteMember(username);
-        // 현재 로그인 세션 삭제
-        session.invalidate();
-        return "redirect:/login";
+        try {
+            myPageService.deleteMember(
+                    username,
+                    currentPassword
+            );
+
+            // 세션 삭제
+            session.invalidate();
+
+            // 시큐리티 인증 정보 삭제
+            SecurityContextHolder.clearContext();
+            return "success";
+        } catch (IllegalArgumentException e) {
+            return "mismatch";
+        }
     }
 
 }
