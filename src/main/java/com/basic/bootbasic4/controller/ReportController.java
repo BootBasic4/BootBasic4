@@ -51,7 +51,7 @@ public class ReportController {
     }
 
     // 5. 신고 승인 처리
-    @PostMapping("/admin/reports/{report_id}/delete")
+    @PostMapping("/admin/reports/{reportId}/delete")
     public String approveReport(@PathVariable Long reportId) {
         reportService.approveReport(reportId);
         return "redirect:/admin/reports";
