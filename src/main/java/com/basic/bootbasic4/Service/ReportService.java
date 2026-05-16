@@ -82,13 +82,7 @@ public class ReportService {
         return reportRepository.findAllByOrderByCreatedAtDesc();
     }
 
-    // 4. 처리 대기 신고 목록 조회
-    @Transactional(readOnly = true)
-    public List<Report> getPendingReports(){
-        return reportRepository.findByStatusOrderByCreatedAtDesc("PENDING");
-    }
-
-    // 5. 신고 승인 처리
+    // 4. 신고 승인 처리
     @Transactional
     public void approveReport(Long reportId){
 
@@ -114,7 +108,7 @@ public class ReportService {
         }
     }
 
-    // 6. 신고 반려 처리
+    // 5. 신고 반려 처리
     @Transactional
     public void rejectReport(Long reportId) {
         Report report = reportRepository.findById(reportId)

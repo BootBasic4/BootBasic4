@@ -43,21 +43,14 @@ public class ReportController {
         return "member/report";
     }
 
-    // 4. 처리 대기 신고 목록 조회
-    @GetMapping("/admin/reports/pending")
-    public String getPendingReports(Model model) {
-        model.addAttribute("reports", reportService.getPendingReports());
-        return "member/report";
-    }
-
-    // 5. 신고 승인 처리
+    // 4. 신고 승인 처리
     @PostMapping("/admin/reports/{reportId}/delete")
     public String approveReport(@PathVariable Long reportId) {
         reportService.approveReport(reportId);
         return "redirect:/admin/reports";
     }
 
-    // 6. 신고 반려 처리
+    // 5. 신고 반려 처리
     @PostMapping("/admin/reports/{reportId}/reject")
     public String rejectReport(@PathVariable Long reportId) {
         reportService.rejectReport(reportId);

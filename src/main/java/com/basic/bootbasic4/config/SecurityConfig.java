@@ -38,14 +38,27 @@ public class SecurityConfig {
 
                         // 그 외 모든 요청은 로그인 필요
                         .anyRequest().authenticated()
-
                 )
 
                 // 로그인 설정
                 .formLogin(login -> login
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/", true)
+
+                        // 로그인 성공 후 권한별 이동
+                        .successHandler((request, response, authentication) -> {
+                            boolean isAdmin = authentication.getAuthorities()
+                                    .stream()
+                                    .anyMatch(auth ->
+                                            auth.getAuthority().equals("ROLE_ADMIN"));
+
+                            if (isAdmin) {
+                                response.sendRedirect("/admin/reports");
+                            } else {
+                                response.sendRedirect("/");
+                            }
+                        })
+
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
@@ -53,7 +66,7 @@ public class SecurityConfig {
                 // 로그아웃 설정
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/")
+                        .logoutSuccessUrl("/login")
                         .permitAll()
                 );
 
