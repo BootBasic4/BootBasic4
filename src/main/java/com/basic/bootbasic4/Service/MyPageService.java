@@ -1,6 +1,7 @@
 package com.basic.bootbasic4.Service;
 
 import com.basic.bootbasic4.Repository.*;
+import com.basic.bootbasic4.dto.MyPageFormDto;
 import com.basic.bootbasic4.entity.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -54,53 +55,39 @@ public class MyPageService {
     }
 
     // 2. 내 정보 수정
-    // 2. 내 정보 수정
     @Transactional
-    public Member updateMyInfo(String username, Member updateMember){
-        Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() ->
-                        new RuntimeException("회원정보를 찾을 수 없습니다."));
+    public Member updateMyInfo(String username, MyPageFormDto dto) {
+        Member member = getMyInfo(username);
 
         // 닉네임 중복 검사
-        if (updateMember.getNickname() != null) {
-            Member existingNicknameMember =
-                    memberRepository.findByNickname(updateMember.getNickname())
-                            .orElse(null);
-
-            // 자기 자신 제외 중복 검사
-            if (existingNicknameMember != null
-                    && !existingNicknameMember.getMemberId()
-                    .equals(member.getMemberId())) {
-                throw new IllegalArgumentException(
-                        "이미 사용 중인 닉네임입니다.");
-            }
-            member.setNickname(updateMember.getNickname());
+        if (dto.getNickname() != null
+                && !dto.getNickname().equals(member.getNickname())
+                && memberRepository.existsByNickname(dto.getNickname())) {
+            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
         }
 
         // 이메일 중복 검사
-        if (updateMember.getEmail() != null) {
-            Member existingEmailMember =
-                    memberRepository.findByEmail(updateMember.getEmail())
-                            .orElse(null);
-
-            // 자기 자신 제외 중복 검사
-            if (existingEmailMember != null
-                    && !existingEmailMember.getMemberId()
-                    .equals(member.getMemberId())) {
-                throw new IllegalArgumentException(
-                        "이미 사용 중인 이메일입니다.");
-            }
-
-            member.setEmail(updateMember.getEmail());
+        if (dto.getEmail() != null
+                && !dto.getEmail().equals(member.getEmail())
+                && memberRepository.existsByEmail(dto.getEmail())) {
+            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
         }
+
+        if (dto.getNickname() != null) {
+            member.setNickname(dto.getNickname());
+        }
+
+        if (dto.getEmail() != null) {
+            member.setEmail(dto.getEmail());
+        }
+
         return member;
     }
 
     // 3. 비밀번호 변경
     @Transactional
     public void updatePassword(String username, String currentPassword, String newPassword){
-        Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("회원정보를 찾을 수 없습니다."));
+        Member member = getMyInfo(username);
 
         if (!passwordEncoder.matches(currentPassword, member.getPassword())){
             throw new RuntimeException("현재 비밀번호가 일치하지 않습니다.");
@@ -112,8 +99,7 @@ public class MyPageService {
     // 4. 회원탈퇴
     @Transactional
     public void deleteMember(String username, String currentPassword) {
-        Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("회원정보를 찾을 수 없습니다."));
+        Member member = getMyInfo(username);
 
         // 입력한 비밀번호와 DB 암호화 비밀번호 비교
         if (!passwordEncoder.matches(currentPassword, member.getPassword())) {

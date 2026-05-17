@@ -1,18 +1,19 @@
 package com.basic.bootbasic4.controller;
 
-import com.basic.bootbasic4.Repository.MemberRepository;
 import com.basic.bootbasic4.Service.MyPageService;
 import com.basic.bootbasic4.dto.MyPageFormDto;
 import com.basic.bootbasic4.entity.Member;
+
 import jakarta.servlet.http.HttpSession;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 
@@ -21,7 +22,6 @@ import java.time.LocalDate;
 public class MyPageController {
 
     private final MyPageService myPageService;
-    private final MemberRepository memberRepository;
 
     // 1, 1-1, 1-2, 마이페이지 메인: 내 정보 + 내 활동 개수 조회
     @GetMapping("/mypage")
@@ -84,12 +84,7 @@ public class MyPageController {
     @PostMapping("/mypage/update")
     public String updateMyInfo(Authentication authentication, @ModelAttribute MyPageFormDto dto) {
         String username = authentication.getName();
-        Member updateMember = Member.builder()
-                .nickname(dto.getNickname())
-                .email(dto.getEmail())
-                .build();
-
-        myPageService.updateMyInfo(username, updateMember);
+        myPageService.updateMyInfo(username, dto);
         return "redirect:/mypage";
     }
 
