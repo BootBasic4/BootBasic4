@@ -1,14 +1,13 @@
 package com.basic.bootbasic4.controller;
 
-import ch.qos.logback.core.model.Model;
+import org.springframework.ui.Model;
 import com.basic.bootbasic4.Service.AnswerService;
 import com.basic.bootbasic4.dto.AnswerFormDto;
-import com.basic.bootbasic4.entity.Answer;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 
 @Controller
@@ -16,49 +15,58 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AnswerController {
 
-    private AnswerService answerService;
+    private final AnswerService answerService;
+    // QuestionService, MemberService 코드 붙이기
 
-//    @GetMapping("/{question_id}")
-//    public String showAnswerForm(@PathVariable String question_id) {
-//        return "/answer/showAnswerForm";
-//    }
 
     // 답변등록 //
     // 답변 내용을 html 에서 작성 -> api 요청
-    // -> 해당 내용(dto)을 서비스에 넘김(이후 db에 저장하고)
+    // -> 세션에서 유저정보를 꺼냄
+    // -> 질문, 유저, 답변 내용(dto)을 서비스에 넘김(이후 db에 저장하고)
     // -> 해당 질문 화면으로 리다이렉트
-    @PostMapping("/{question_id}")
-    public String addAnswer(@PathVariable("question_id") Long questionId, AnswerFormDto answerFormDto) {
-        answerService.save(questionId, answerFormDto);
+    @PostMapping("/{questionId}")
+    public String addAnswer(@PathVariable Long questionId, AnswerFormDto answerFormDto, @AuthenticationPrincipal UserDetails userDetails) {
+        // TODO: questionService로 Qeustion 객체 가져와서 answerService에 넘기기
+        // TODO: memberService로 member 객체 가져와서 answerService에 넘기기
+        //answerService.create(question, member, answerFormDto);
         return "redirect:/question/"+questionId;
     }
 
+    // 답변수정 화면 get//
+    // 답변id는 경로변수, 질문id는 쿼리변수
+    // 답변수정클릭 -> 답변수정화면으로
+    @GetMapping("edit/{answerId}")
+    public String editAnswerForm(@PathVariable Long answerId, @RequestParam Long questionId, Model model, @AuthenticationPrincipal UserDetails userDetails) {
+        // TODO: 작성자 본인인지 확인하는 코드
 
-    // 답변조회 //
-    // 특정 게시글을 누르면 해당 게시글의 모든 답변 반환
-    @GetMapping("/{question_id}")
-    public String findAnswer(@PathVariable("question_id") Long questionId, Model model) {
-        List<Answer> answerList = answerService.getAnswerByQuestionId(questionId);
-        model.addAttribute("answerList", answerList); // question_id 에 해당하는 답변 내역들
-        model.addAttribute("question_id", questionId); // quesiton_id
-        return "question/detail";
+        answerService.findById(answerId).ifPresent(answer
+                -> model.addAttribute("answer", answer));
+        model.addAttribute("questionId", questionId);
+
+        return "answer/edit";
     }
 
-
     // 답변수정 //
-    // 답변을 수정하면 -> 다시 해당 질문 화면으로 돌아감
-    @PostMapping("/edit/{answer_id}")
-    public String editAnswer(@PathVariable("answer_id") Long answerId, AnswerFormDto answerFormDto) {
-        // 서비스에서 질문 id 리턴해주기
-        Long questionId = answerService.edit(answerId, answerFormDto);
+    // 답변을 수정하면 -> 다시 해당 질문 화면으로 돌아감(
+    // 수정할 질문 id 경로 변수로 받고, 리다이렉트를 위한 질문 id는 쿼리변수
+    @PostMapping("/edit/{answerId}")
+    public String editAnswer(@PathVariable Long answerId, @RequestParam Long questionId, AnswerFormDto answerFormDto, @AuthenticationPrincipal UserDetails userDetails) {
+        // TODO: 작성자 본인 확인
+
+        answerService.edit(answerId, answerFormDto);
         return "redirect:/question/"+questionId;
     }
 
     // 답변삭제 //
-    @PostMapping("/delete/{answer_id}")
-    public String deleteAnswer(@PathVariable("answer_id") Long answerId) {
-        Long questionId=answerService.delete(answerId);
-        return "redirect:/question/"+answerId;
+    // 답변id는 경로변수, 질문id는 쿼리변수
+    // 답변삭제클릭-> api 요청
+    // -> 작성자인지확인
+    // -> 서비스에 삭제 요청
+    @PostMapping("/delete/{answerId}")
+    public String deleteAnswer(@PathVariable Long answerId, @RequestParam Long questionId, @AuthenticationPrincipal UserDetails userDetails) {
+        // TODO: 세션의 유저가 작성자 본인인지 확인
+        answerService.delete(answerId);
+        return "redirect:/question/"+questionId;
     }
 
 }

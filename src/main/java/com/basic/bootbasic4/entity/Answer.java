@@ -34,7 +34,7 @@ public class Answer {
     // Member dto 작성되면 확인
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="member_id", nullable=false)
-    private Member memberId;
+    private Member member;
 
     // 생성 일자
     @Column(name="created_at", nullable=false)
