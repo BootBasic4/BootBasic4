@@ -1,7 +1,10 @@
 package com.basic.bootbasic4.Service;
 
 import com.basic.bootbasic4.Repository.MemberRepository;
+import com.basic.bootbasic4.entity.Member;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -10,7 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.basic.bootbasic4.entity.Member;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +23,17 @@ public class MemberService implements UserDetailsService {
 
     // 회원가입
     @Transactional
-    public Member register(Member member){
+    public Member register(Member member) {
+        if (memberRepository.existsByUsername(member.getUsername())) {
+            throw new IllegalArgumentException("이미 사용중인 아이디입니다.");
+        }
+        if (memberRepository.existsByNickname(member.getNickname())) {
+            throw new IllegalArgumentException("이미 사용중인 닉네임입니다.");
+        }
+        if (memberRepository.existsByEmail(member.getEmail())) {
+            throw new IllegalArgumentException("이미 사용중인 이메일입니다.");
+        }
+
         member.setPassword(passwordEncoder.encode(member.getPassword()));
         member.setRole("ROLE_USER");
         return memberRepository.save(member);

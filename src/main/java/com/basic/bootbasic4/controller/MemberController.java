@@ -3,10 +3,16 @@ package com.basic.bootbasic4.controller;
 import com.basic.bootbasic4.Service.MemberService;
 import com.basic.bootbasic4.dto.MemberFormDto;
 import com.basic.bootbasic4.entity.Member;
+
+import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
 
 @Controller
 @RequiredArgsConstructor
@@ -21,7 +27,7 @@ public class MemberController {
         return "member/signup";
     }
 
-    // 중복확인 - 아이디(로그인용)
+    // 중복확인 - 아이디
     @GetMapping("/check-username")
     @ResponseBody
     public String checkUsername(@RequestParam String username) {
@@ -42,10 +48,30 @@ public class MemberController {
         return memberService.existsByEmail(email) ? "duplicate" : "available";
     }
 
-
     // 회원가입 처리
     @PostMapping("/signup")
-    public String register(@ModelAttribute MemberFormDto dto) {
+    public String register(@Valid @ModelAttribute MemberFormDto dto,
+                           BindingResult bindingResult) {
+
+        // DTO 기본 검증 실패
+        if (bindingResult.hasErrors()) {
+            return "redirect:/signup?validationError=true";
+        }
+
+        // 서버단 아이디 중복 검사
+        if (memberService.existsByUsername(dto.getUsername())) {
+            return "redirect:/signup?usernameDuplicate=true";
+        }
+
+        // 서버단 닉네임 중복 검사
+        if (memberService.existsByNickname(dto.getNickname())) {
+            return "redirect:/signup?nicknameDuplicate=true";
+        }
+
+        // 서버단 이메일 중복 검사
+        if (memberService.existsByEmail(dto.getEmail())) {
+            return "redirect:/signup?emailDuplicate=true";
+        }
 
         // 비밀번호 정책 검사
         if (!isValidPassword(dto.getPassword())) {
@@ -67,44 +93,37 @@ public class MemberController {
                 .build();
 
         memberService.register(member);
+
         return "redirect:/login";
     }
 
-    // 비밀번호 정책 검사 메서드
+    // 비밀번호 정책 검사
     private boolean isValidPassword(String password) {
         if (password == null) {
             return false;
         }
-
-        // 공백 제외 길이 검사
         String noSpacePassword = password.replaceAll("\\s", "");
 
         if (noSpacePassword.length() < 8 || noSpacePassword.length() > 16) {
             return false;
         }
 
-        // 같은 문자/숫자 3번 연속 금지
         if (password.matches(".*(.)\\1\\1.*")) {
             return false;
         }
-
         int count = 0;
-        // 영문 포함 여부
+
         if (password.matches(".*[A-Za-z].*")) {
             count++;
         }
 
-        // 숫자 포함 여부
         if (password.matches(".*\\d.*")) {
             count++;
         }
 
-        // 특수문자 포함 여부
         if (password.matches(".*[@$!%*#?&].*")) {
             count++;
         }
-
-        // 영문/숫자/특수문자 중 2가지 이상 포함
         return count >= 2;
     }
 
@@ -113,5 +132,4 @@ public class MemberController {
     public String loginForm() {
         return "member/login";
     }
-
 }
