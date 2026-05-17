@@ -25,6 +25,7 @@ public class Report {
     @Column(nullable = false, length = 200)
     private String reason;
 
+    @Builder.Default
     @Column(nullable = false, length = 20)
     private String status = "PENDING";
 

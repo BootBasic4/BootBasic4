@@ -41,7 +41,6 @@ public class ReportService {
                 .reporter(member)
                 .question(question)
                 .reason(reason)
-                .status("PENDING")
                 .build();
 
         reportRepository.save(report);
