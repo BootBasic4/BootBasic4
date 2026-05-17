@@ -50,7 +50,7 @@
                     </td>
 
                     <td>
-                        <a th:href="@{/questions/{id}(id=${answer.question.id})}"
+                        <a th:href="@{/questions/detail/{id}(id=${answer.question.id})}"
                            class="text-decoration-none text-dark fw-semibold"
                            th:text="${answer.content}">
                             댓글 내용
