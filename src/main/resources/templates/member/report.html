@@ -87,14 +87,14 @@
                     th:classappend="${report.status != 'PENDING'} ? ' text-muted'">
 
                     <a th:if="${report.question != null}"
-                       th:href="@{/questions/{questionId}(questionId=${report.question.id})}"
+                       th:href="@{/questions/detail/{questionId}(questionId=${report.question.id})}"
                        th:text="${report.reason}"
                        th:class="${report.status != 'PENDING'} ? 'text-decoration-none text-muted' : 'text-decoration-none text-dark'">
                         신고 사유
                     </a>
 
                     <a th:if="${report.answer != null}"
-                       th:href="@{/questions/{questionId}(questionId=${report.answer.question.id})}"
+                       th:href="@{/questions/detail/{questionId}(questionId=${report.answer.question.id})}"
                        th:text="${report.reason}"
                        th:class="${report.status != 'PENDING'} ? 'text-decoration-none text-muted' : 'text-decoration-none text-dark'">
                         신고 사유
