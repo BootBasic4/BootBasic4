@@ -70,6 +70,16 @@ public class QuestionController {
         return "redirect:/questions/detail/" + id;
     }
 
+    // (추가) @GetMapping {question_form.html}
+    @GetMapping("/edit/{question_id}")
+    public String editForm(@PathVariable("question_id") Long id, Model model) {
+        QuestionResponseDto dto = questionService.getQuestionDetail(id);
+        model.addAttribute("dto", dto);
+        model.addAttribute("questionId", id);
+        return "question/question_form";
+    }
+
+
     // 5. 질문 수정 (POST /questions/edit/{question_id})
     @PostMapping("/edit/{question_id}")
     public String edit(@PathVariable("question_id") Long id,
