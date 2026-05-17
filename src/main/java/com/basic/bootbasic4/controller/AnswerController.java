@@ -28,8 +28,8 @@ public class AnswerController {
     public String addAnswer(@PathVariable Long questionId, AnswerFormDto answerFormDto, @AuthenticationPrincipal UserDetails userDetails) {
         // TODO: questionService로 Qeustion 객체 가져와서 answerService에 넘기기
         // TODO: memberService로 member 객체 가져와서 answerService에 넘기기
-        //answerService.create(question, member, answerFormDto);
-        return "redirect:/question/"+questionId;
+        // answerService.create(question, member, answerFormDto);
+        return "redirect:/questions/detail/"+questionId;
     }
 
     // 답변수정 화면 get//
@@ -54,7 +54,7 @@ public class AnswerController {
         // TODO: 작성자 본인 확인
 
         answerService.edit(answerId, answerFormDto);
-        return "redirect:/question/"+questionId;
+        return "redirect:/question/detail/"+questionId;
     }
 
     // 답변삭제 //
@@ -66,7 +66,7 @@ public class AnswerController {
     public String deleteAnswer(@PathVariable Long answerId, @RequestParam Long questionId, @AuthenticationPrincipal UserDetails userDetails) {
         // TODO: 세션의 유저가 작성자 본인인지 확인
         answerService.delete(answerId);
-        return "redirect:/question/"+questionId;
+        return "redirect:/question/detail"+questionId;
     }
 
 }
