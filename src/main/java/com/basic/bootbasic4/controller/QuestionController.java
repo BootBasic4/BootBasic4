@@ -54,6 +54,15 @@ public class QuestionController {
         return "question/detail";
     }
 
+    // (추가) 질문 등록 폼으로 이동 (GET /questions/add)
+    @GetMapping("/add")
+    public String addForm(Model model) {
+
+        model.addAttribute("dto", new QuestionRequestDto());
+
+        return "question/question_form";
+    }
+
     // 4. 질문 등록 (POST /questions/add)
     @PostMapping("/add")
     public String add(@Valid @ModelAttribute("dto") QuestionRequestDto dto,
@@ -63,7 +72,7 @@ public class QuestionController {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("category", dto.getCategory());
-            return "question/question_Form";
+            return "question/question_form";
         }
 
         Long id = questionService.addQuestion(dto, member);
