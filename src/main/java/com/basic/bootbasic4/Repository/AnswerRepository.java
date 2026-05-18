@@ -13,4 +13,7 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
 
     // 내가 작성한 답변 목록
     List<Answer> findByMemberOrderByCreatedAtDesc(Member member);
+
+    // 특정 질문에 대한 답변 목록 조회
+    List<Answer> findByQuestion_QuestionIdOrderByCreatedAtAsc(Long questionId);
 }

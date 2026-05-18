@@ -1,46 +1,56 @@
 package com.basic.bootbasic4.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "answer")
+@Table(name="answer")
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@EntityListeners(AuditingEntityListener.class)
 public class Answer {
 
+    // 답변 고유 번호
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "answer_id")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Column(name="answer_id")
     private Long answerId;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    // 답변 내용
+    @Column(columnDefinition="TEXT", nullable=false)
     private String content;
 
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    // 질문 고유 번호
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="question_id", nullable=false)
+    private Question question;
 
-    @LastModifiedDate
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    // 답변 작성자
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
+    // 작성자 고유 번호
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="member_id", nullable=false)
     private Member member;
 
-    // 어떤 질문의 답변인지
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "question_id", nullable = false)
-    private Question question;
+    // 생성 일자
+    @Column(name="created_at", nullable=false)
+    private LocalDateTime createdAt;
+
+    // 수정 일자
+    @Column(name="updated_at")
+    private LocalDateTime updatedAt;
+
+    // insert 직전에 실행
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    // update 직전에 실행
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }
