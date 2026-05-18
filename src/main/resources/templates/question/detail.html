@@ -1,1 +1,68 @@
-<h1>TEST DETAIL PAGE</h1>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>상세보기 - [[${question.title}]]</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .detail-container { max-width: 900px; margin-top: 50px; }
+        .post-header { border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
+        .post-meta { font-size: 0.9rem; color: #888; }
+        .post-content { min-height: 300px; line-height: 1.6; position: relative; }
+        .post-date { position: absolute; top: 0; right: 0; font-size: 0.85rem; color: #aaa; }
+        .comment-section { background-color: #f9f9f9; padding: 20px; border-radius: 8px; margin-top: 50px; }
+        .comment-item { border-bottom: 1px solid #eee; padding: 15px 0; }
+        .comment-item:last-child { border-bottom: none; }
+    </style>
+</head>
+<body>
+<div class="container detail-container">
+    <div class="post-header">
+        <h2 class="fw-bold mb-3" th:text="${question.title}">게시글 제목</h2>
+        <div class="post-meta d-flex gap-3">
+            <span><i class="bi bi-person"></i> [[${question.nickname}]]</span>
+            <span><i class="bi bi-chat-dots"></i> 댓글 [[${question.commentCount}]]</span>
+            <span><i class="bi bi-eye"></i> 조회 [[${question.viewCount}]]</span>
+        </div>
+    </div>
+
+    <div class="post-content">
+        <div class="post-date">
+            <span th:text="${#temporals.format(question.createdAt, 'yyyy.MM.dd. HH:mm')}">2026.05.11. 23:04</span>
+        </div>
+
+        <div class="mt-4">
+            <div th:if="${question.imageUrl}" class="mb-4">
+                <img th:src="${question.imageUrl}" class="img-fluid rounded">
+            </div>
+            <p th:text="${question.content}" style="white-space: pre-wrap;">게시글 본문 내용</p>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mt-5">
+        <a th:href="@{/questions/{cat}(cat=${question.category})}" class="btn btn-outline-secondary">목록으로</a>
+        <a th:href="@{/questions/edit/{id}(id=${question.id})}" class="btn btn-light border">수정</a>
+        <form th:action="@{/questions/delete/{id}(id=${question.id})}" method="post">
+            <input type="hidden" name="category" th:value="${question.category}">
+            <button type="submit" class="btn btn-danger" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</button>
+        </form>
+    </div>
+
+    <div class="comment-section">
+        <h5 class="fw-bold mb-4">댓글 <span class="text-primary">0</span></h5>
+
+        <div class="comment-list">
+            <p class="text-center text-muted py-3">아직 등록된 댓글이 없습니다.</p>
+        </div>
+
+        <div class="mt-4">
+            <textarea class="form-control mb-2" rows="3" placeholder="댓글을 남겨보세요"></textarea>
+            <div class="d-flex justify-content-end">
+                <button class="btn btn-dark">등록</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
