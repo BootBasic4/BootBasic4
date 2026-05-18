@@ -5,6 +5,7 @@ import com.basic.bootbasic4.dto.MyPageFormDto;
 import com.basic.bootbasic4.entity.Member;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -70,33 +71,51 @@ public class MyPageController {
 
     // 3. 비밀번호 변경
     @PostMapping("/password")
-    public String updatePassword(
+    @ResponseBody
+    public ResponseEntity<String> updatePassword(
             Authentication authentication,
             @ModelAttribute MyPageFormDto dto) {
 
         String username = authentication.getName();
 
-        myPageService.updatePassword(
-                username,
-                dto.getCurrentPassword(),
-                dto.getNewPassword()
-        );
+        try {
+            myPageService.updatePassword(
+                    username,
+                    dto.getCurrentPassword(),
+                    dto.getNewPassword(),
+                    dto.getConfirmNewPassword()
+            );
+            return ResponseEntity.ok("success");
 
-        return "redirect:/mypage";
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     // 4. 회원 탈퇴
     @PostMapping("/delete")
+    @ResponseBody
     public String deleteMember(Authentication authentication,
                                @RequestParam String currentPassword,
                                HttpSession session) {
+
         String username = authentication.getName();
+        try {
+            myPageService.deleteMember(
+                    username,
+                    currentPassword
+            );
 
-        myPageService.deleteMember(username, currentPassword);
+            // 세션 삭제
+            session.invalidate();
+            // 시큐리티 인증 정보 삭제
+            SecurityContextHolder.clearContext();
 
-        session.invalidate();
-        SecurityContextHolder.clearContext();
+            return "success";
+        } catch (IllegalArgumentException e) {
 
-        return "redirect:/";
+            return "mismatch";
+        }
     }
+
 }

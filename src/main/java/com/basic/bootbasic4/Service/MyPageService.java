@@ -43,13 +43,11 @@ public class MyPageService {
     }
 
     // 1-3. 내가 작성한 질문 목록
-    @Transactional(readOnly = true)
     public List<Question> getMyQuestions(Member member) {
         return questionRepository.findByMemberOrderByCreatedAtDesc(member);
     }
 
     // 1-4. 내가 작성한 답변 목록
-    @Transactional(readOnly = true)
     public List<Answer> getMyAnswers(Member member) {
         return answerRepository.findByMemberOrderByCreatedAtDesc(member);
     }
@@ -96,11 +94,14 @@ public class MyPageService {
 
     // 3. 비밀번호 변경
     @Transactional
-    public void updatePassword(String username, String currentPassword, String newPassword){
+    public void updatePassword(String username, String currentPassword, String newPassword, String confirmPassword){
         Member member = getMyInfo(username);
 
-        if (!passwordEncoder.matches(currentPassword, member.getPassword())){
+        if (!passwordEncoder.matches(currentPassword, member.getPassword())) {
             throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
+        }
+        if (!newPassword.equals(confirmPassword)) {
+            throw new IllegalArgumentException("새 비밀번호가 일치하지 않습니다.");
         }
 
         member.setPassword(passwordEncoder.encode(newPassword));

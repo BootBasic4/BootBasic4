@@ -367,6 +367,8 @@
             </div>
 
             <form id="passwordForm"
+                  action="/mypage/password"
+                  method="post"
                   onsubmit="return validatePasswordModal()">
 
                 <div class="modal-body">
@@ -438,6 +440,7 @@
                     <div class="input-group mb-2">
                         <input type="password"
                                id="confirmNewPassword"
+                               name="confirmNewPassword"
                                class="form-control"
                                style="max-width: 290px"
                                placeholder="새 비밀번호 확인"
@@ -491,7 +494,9 @@
                         data-bs-dismiss="modal"></button>
             </div>
 
-            <form onsubmit="return deleteMember(event)">
+            <form action="/mypage/delete"
+                  method="post"
+                  onsubmit="return deleteMember(event)">
 
                 <div class="modal-body">
 
