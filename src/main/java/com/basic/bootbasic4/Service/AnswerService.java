@@ -3,11 +3,13 @@ package com.basic.bootbasic4.Service;
 import com.basic.bootbasic4.Repository.AnswerRepository;
 import com.basic.bootbasic4.dto.AnswerFormDto;
 import com.basic.bootbasic4.entity.Answer;
+import com.basic.bootbasic4.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -43,14 +45,21 @@ public class AnswerService {
     // 답변 수정
     @Transactional
     public void edit(Long answerId, AnswerFormDto dto) {
-        answerRepository.findById(answerId).ifPresent(answer -> {
-            answer.setContent(dto.getContent());
-        });
+
+        // 답변 id 조회하고 없으면 에러 throw
+        Answer answer = answerRepository.findById(answerId).orElseThrow(
+                ()->new NoSuchElementException(ErrorCode.ANSWER_NOT_FOUND.getMessage())
+        );
+        // 있는 경우에 수정 답변 반영
+        answer.setContent(dto.getContent());
     }
 
     // 답변 삭제
     @Transactional
     public void delete(Long answerId) {
-        answerRepository.findById(answerId).ifPresent(answerRepository::delete);
+        Answer answer = answerRepository.findById(answerId).orElseThrow(
+                ()->new NoSuchElementException(ErrorCode.ANSWER_NOT_FOUND.getMessage())
+        );
+        answerRepository.delete(answer);
     }
 }

@@ -1,5 +1,8 @@
 package com.basic.bootbasic4.controller;
 
+import com.basic.bootbasic4.entity.Answer;
+import com.basic.bootbasic4.exception.ErrorCode;
+import jakarta.validation.Valid;
 import org.springframework.ui.Model;
 import com.basic.bootbasic4.Service.AnswerService;
 import com.basic.bootbasic4.dto.AnswerFormDto;
@@ -7,7 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.NoSuchElementException;
 
 
 @Controller
@@ -25,7 +31,10 @@ public class AnswerController {
     // -> 질문, 유저, 답변 내용(dto)을 서비스에 넘김(이후 db에 저장하고)
     // -> 해당 질문 화면으로 리다이렉트
     @PostMapping("/{questionId}")
-    public String addAnswer(@PathVariable Long questionId, AnswerFormDto answerFormDto, @AuthenticationPrincipal UserDetails userDetails) {
+    public String addAnswer(@PathVariable Long questionId, @Valid AnswerFormDto answerFormDto, BindingResult bindingResult, @AuthenticationPrincipal UserDetails userDetails) {
+        if(bindingResult.hasErrors()) {
+            return "redirect:/questions/detail/" + questionId;
+        }
         // TODO: questionService로 Qeustion 객체 가져와서 answerService에 넘기기
         // TODO: memberService로 member 객체 가져와서 answerService에 넘기기
         // answerService.create(question, member, answerFormDto);
@@ -35,13 +44,17 @@ public class AnswerController {
     // 답변수정 화면 get//
     // 답변id는 경로변수, 질문id는 쿼리변수
     // 답변수정클릭 -> 답변수정화면으로
-    @GetMapping("edit/{answerId}")
+    @GetMapping("/edit/{answerId}")
     public String editAnswerForm(@PathVariable Long answerId, @RequestParam Long questionId, Model model, @AuthenticationPrincipal UserDetails userDetails) {
         // TODO: 작성자 본인인지 확인하는 코드
+        // if (!answer.getMember().getUsername().equals(userDetails.getUsername())) {
+        //    throw new AccessDeniedException(ErrorCode.ANSWER_UNAUTHORIZED.getMessage());
+        //}
 
-        answerService.findById(answerId).ifPresent(answer
-                -> model.addAttribute("answer", answer));
-        model.addAttribute("questionId", questionId);
+        Answer answer = answerService.findById(answerId).orElseThrow(
+                ()->new NoSuchElementException(ErrorCode.ANSWER_NOT_FOUND.getMessage())
+        );
+        model.addAttribute("answer", answer);
 
         return "answer/edit";
     }
@@ -52,6 +65,9 @@ public class AnswerController {
     @PostMapping("/edit/{answerId}")
     public String editAnswer(@PathVariable Long answerId, @RequestParam Long questionId, AnswerFormDto answerFormDto, @AuthenticationPrincipal UserDetails userDetails) {
         // TODO: 작성자 본인 확인
+        // if (!answer.getMember().getUsername().equals(userDetails.getUsername())) {
+        //    throw new AccessDeniedException(ErrorCode.ANSWER_UNAUTHORIZED.getMessage());
+        //}
 
         answerService.edit(answerId, answerFormDto);
         return "redirect:/question/detail/"+questionId;
@@ -65,8 +81,12 @@ public class AnswerController {
     @PostMapping("/delete/{answerId}")
     public String deleteAnswer(@PathVariable Long answerId, @RequestParam Long questionId, @AuthenticationPrincipal UserDetails userDetails) {
         // TODO: 세션의 유저가 작성자 본인인지 확인
+        // if (!answer.getMember().getUsername().equals(userDetails.getUsername())) {
+        //    throw new AccessDeniedException(ErrorCode.ANSWER_UNAUTHORIZED.getMessage());
+        //}
+
         answerService.delete(answerId);
-        return "redirect:/question/detail"+questionId;
+        return "redirect:/question/detail/"+questionId;
     }
 
 }

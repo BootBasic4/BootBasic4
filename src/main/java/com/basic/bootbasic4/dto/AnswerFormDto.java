@@ -1,5 +1,6 @@
 package com.basic.bootbasic4.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 public class AnswerFormDto {
 
     // 등록/조회/수정
+    @NotBlank(message="답변 내용 입력해주세요")
     private String content;
 
     // 등록/조회
