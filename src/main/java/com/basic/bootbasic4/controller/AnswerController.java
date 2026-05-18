@@ -1,5 +1,6 @@
 package com.basic.bootbasic4.controller;
 
+import com.basic.bootbasic4.Service.QuestionService;
 import com.basic.bootbasic4.entity.Answer;
 import com.basic.bootbasic4.exception.ErrorCode;
 import jakarta.validation.Valid;
@@ -22,7 +23,8 @@ import java.util.NoSuchElementException;
 public class AnswerController {
 
     private final AnswerService answerService;
-    // QuestionService, MemberService 코드 붙이기
+    private final QuestionService quesstionService;
+    // MemberService 코드 붙이기
 
 
     // 답변등록 //
@@ -38,6 +40,7 @@ public class AnswerController {
         // TODO: questionService로 Qeustion 객체 가져와서 answerService에 넘기기
         // TODO: memberService로 member 객체 가져와서 answerService에 넘기기
         // answerService.create(question, member, answerFormDto);
+        // 해당 부분 민경님 코드 머지되고 제일 마지막에 추가하면 될 듯
         return "redirect:/questions/detail/"+questionId;
     }
 
@@ -55,6 +58,8 @@ public class AnswerController {
                 ()->new NoSuchElementException(ErrorCode.ANSWER_NOT_FOUND.getMessage())
         );
         model.addAttribute("answer", answer);
+        // 아래 빠져서 답변 수정 후 원래 게시글 화면으로 안 돌아갔었음 ㅠ
+        model.addAttribute("questionId", questionId);
 
         return "answer/edit";
     }
@@ -69,8 +74,12 @@ public class AnswerController {
         //    throw new AccessDeniedException(ErrorCode.ANSWER_UNAUTHORIZED.getMessage());
         //}
 
+        System.out.println("answerId: " + answerId);
+        System.out.println("questionId: " + questionId);
+        System.out.println("content: " + answerFormDto.getContent());
+
         answerService.edit(answerId, answerFormDto);
-        return "redirect:/question/detail/"+questionId;
+        return "redirect:/questions/detail/"+questionId;
     }
 
     // 답변삭제 //
@@ -86,7 +95,7 @@ public class AnswerController {
         //}
 
         answerService.delete(answerId);
-        return "redirect:/question/detail/"+questionId;
+        return "redirect:/questions/detail/"+questionId;
     }
 
 }

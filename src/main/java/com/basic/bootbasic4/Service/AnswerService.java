@@ -3,6 +3,7 @@ package com.basic.bootbasic4.Service;
 import com.basic.bootbasic4.Repository.AnswerRepository;
 import com.basic.bootbasic4.dto.AnswerFormDto;
 import com.basic.bootbasic4.entity.Answer;
+import com.basic.bootbasic4.entity.Question;
 import com.basic.bootbasic4.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ public class AnswerService {
     // 답변 목록 조회
     @Transactional(readOnly = true)
     public List<Answer> getAnswersByQuestionId(Long questionId) {
-        return answerRepository.findByQuestion_QuestionIdOrderByCreatedAtAsc(questionId);
+        return answerRepository.findByQuestion_IdOrderByCreatedAtAsc(questionId);
     }
 
     // 답변 하나 조회(수정하는 페이지에서 필요)
