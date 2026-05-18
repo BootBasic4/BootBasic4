@@ -4,9 +4,13 @@ package com.basic.bootbasic4.controller;
 import com.basic.bootbasic4.Service.QuestionService;
 import com.basic.bootbasic4.dto.QuestionRequestDto;
 import com.basic.bootbasic4.dto.QuestionResponseDto;
+import com.basic.bootbasic4.dto.QuestionSummaryDto;
+import com.basic.bootbasic4.entity.QuestionCategory;
+import com.basic.bootbasic4.entity.QuestionPetType;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -15,10 +19,14 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/questions")
 public class QuestionController {
+
+    private static final Set<String> ALLOWED_SORT_FIELDS = Set.of("createdAt", "viewCount", "updatedAt");
 
     private final QuestionService questionService;
 
@@ -94,13 +102,41 @@ public class QuestionController {
         return "redirect:/questions/" + category;
     }
 
-    // 7. 질문 통합 검색 (GET /questions/search)
-    @GetMapping("/search")
-    public String search(@RequestParam String keyword,
-                         @PageableDefault(size = 10) Pageable pageable,
-                         Model model) {
-        Page<QuestionResponseDto> searchList = questionService.searchAll(keyword, pageable);
-        model.addAttribute("questions", searchList);
+    // 7. 검색 + 정렬 + 페이징 (GET /questions?keyword=&category=&petType=&sort=&direction=&page=&size=)
+    @GetMapping
+    public String list(
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "") String category,
+            @RequestParam(defaultValue = "") String petType,
+            @RequestParam(defaultValue = "createdAt") String sort,
+            @RequestParam(defaultValue = "desc") String direction,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Model model
+    ) {
+        if (!ALLOWED_SORT_FIELDS.contains(sort)) {
+            sort = "createdAt";
+        }
+        Sort sortObj = "asc".equalsIgnoreCase(direction)
+                ? Sort.by(sort).ascending()
+                : Sort.by(sort).descending();
+
+        QuestionCategory categoryEnum = category.isBlank() ? null : QuestionCategory.valueOf(category.toUpperCase());
+        QuestionPetType petTypeEnum = petType.isBlank() ? null : QuestionPetType.valueOf(petType.toUpperCase());
+
+        Pageable pageable = PageRequest.of(page, size, sortObj);
+        Page<QuestionSummaryDto> questions = questionService.search(keyword, categoryEnum, petTypeEnum, pageable);
+
+        model.addAttribute("questions", questions);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("category", categoryEnum);
+        model.addAttribute("petType", petTypeEnum);
+        model.addAttribute("sort", sort);
+        model.addAttribute("direction", direction);
+        model.addAttribute("categories", QuestionCategory.values());
+        model.addAttribute("petTypes", QuestionPetType.values());
+
         return "question/list";
     }
+
 }
