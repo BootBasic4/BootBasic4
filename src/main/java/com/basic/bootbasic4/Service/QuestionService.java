@@ -6,6 +6,7 @@ import com.basic.bootbasic4.dto.QuestionResponseDto;
 import com.basic.bootbasic4.entity.Question;
 import com.basic.bootbasic4.entity.QuestionCategory;
 import com.basic.bootbasic4.entity.QuestionPetType;
+import com.basic.bootbasic4.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,22 +23,39 @@ public class QuestionService {
     // 1. 게시글 등록
     @Transactional
     public Long addQuestion(QuestionRequestDto dto, Member member) {
+        // 1. 작성자 검증 (로그인 여부 체크)
+        if (member == null || member.getId() == null) {
+            throw new IllegalArgumentException(ErrorCode.MEMBER_NOT_LOGGED_IN.getMessage());
+        }
+
         Question question = dto.toEntity();
-        question.setMember(member); // 작성자 정보 연결
+        question.setMember(member);
+
         return questionRepository.save(question).getId();
     }
 
     // 2. 게시판별 질문 목록
     public Page<QuestionResponseDto> getListByCategory(String category, String petType, Pageable pageable) {
+        QuestionCategory categoryEnum;
+
+        try {
+            categoryEnum = QuestionCategory.valueOf(category.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(ErrorCode.QUESTION_INVALID_CATEGORY.getMessage());
+        }
+
+        QuestionPetType petTypeEnum;
+        try {
+            petTypeEnum = QuestionPetType.valueOf(petType.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(ErrorCode.INVALID_INPUT.getMessage());
+        }
+
         Page<Question> questions;
 
-        QuestionCategory categoryEnum = QuestionCategory.valueOf(category.toUpperCase());
-        QuestionPetType petTypeEnum = QuestionPetType.valueOf(petType.toUpperCase());
-
-        if (petType == null || petType.equalsIgnoreCase("ALL")) {
+        if (petTypeEnum == QuestionPetType.ALL) {
             questions = questionRepository.findByCategory(categoryEnum, pageable);
         } else {
-
             questions = questionRepository.findByCategoryAndPetType(categoryEnum, petTypeEnum, pageable);
         }
 
@@ -47,19 +65,23 @@ public class QuestionService {
     // 3. 상세 조회
     @Transactional
     public QuestionResponseDto getQuestionDetail(Long id) {
-        Question question = questionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + id));
+        Question question = findQuestionById(id);
 
         question.setViewCount(question.getViewCount() + 1);
 
         return QuestionResponseDto.from(question);
     }
 
+
     // 4. 게시글 수정
     @Transactional
-    public void updateQuestion(Long id, QuestionRequestDto dto) {
-        Question question = questionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + id));
+    public void updateQuestion(Long id, QuestionRequestDto dto, Member currentMember) {
+
+        Question question = findQuestionById(id);
+
+        if (!question.getMember().getId().equals(currentMember.getId())) {
+            throw new IllegalArgumentException(ErrorCode.QUESTION_UNAUTHORIZED.getMessage());
+        }
 
         question.setTitle(dto.getTitle());
         question.setContent(dto.getContent());
@@ -68,11 +90,15 @@ public class QuestionService {
         question.setPetType(dto.getPetType());
     }
 
+
     // 5. 게시글 삭제
     @Transactional
-    public void deleteQuestion(Long id) {
-        Question question = questionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + id));
+    public void deleteQuestion(Long id, Member currentMember) {
+        Question question = findQuestionById(id);
+
+        if (!question.getMember().getId().equals(currentMember.getId())) {
+            throw new IllegalArgumentException(ErrorCode.QUESTION_UNAUTHORIZED.getMessage());
+        }
 
         questionRepository.delete(question);
     }
@@ -83,4 +109,10 @@ public class QuestionService {
                 .map(QuestionResponseDto::from);
     }
 
+
+    // ID로 게시글 찾기(예외 처리)
+    private Question findQuestionById(Long id) {
+        return questionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(ErrorCode.QUESTION_NOT_FOUND.getMessage()));
+    }
 }

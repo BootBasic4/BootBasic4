@@ -94,6 +94,7 @@ public class QuestionController {
     public String edit(@PathVariable("question_id") Long id,
                        @Valid @ModelAttribute("dto") QuestionRequestDto dto,
                        BindingResult bindingResult,
+                       Member member,
                        Model model) {
 
         if (bindingResult.hasErrors()) {
@@ -102,14 +103,14 @@ public class QuestionController {
             return "question/question_form";
         }
 
-        questionService.updateQuestion(id, dto);
+        questionService.updateQuestion(id, dto, member);
         return "redirect:/questions/detail/" + id;
     }
 
     // 6. 질문 삭제 (POST /questions/delete/{question_id})
     @PostMapping("/delete/{question_id}")
-    public String delete(@PathVariable("question_id") Long id, @RequestParam String category) {
-        questionService.deleteQuestion(id);
+    public String delete(@PathVariable("question_id") Long id, @RequestParam String category, Member member) {
+        questionService.deleteQuestion(id, member);
         return "redirect:/questions/" + category;
     }
 
