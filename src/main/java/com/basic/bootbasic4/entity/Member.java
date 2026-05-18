@@ -1,10 +1,14 @@
 package com.basic.bootbasic4.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "member")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Member {
 
     @Id
@@ -36,27 +40,8 @@ public class Member {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    protected Member() {}
-
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
-
-    public Long getMemberId() { return memberId; }
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
-    public String getNickname() { return nickname; }
-    public void setNickname(String nickname) { this.nickname = nickname; }
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
-    public String getPetType() { return petType; }
-    public void setPetType(String petType) { this.petType = petType; }
-    public Integer getPetStarted() { return petStarted; }
-    public void setPetStarted(Integer petStarted) { this.petStarted = petStarted; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
 }
