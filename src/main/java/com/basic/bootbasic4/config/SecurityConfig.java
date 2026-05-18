@@ -19,6 +19,18 @@ public class SecurityConfig {
 
                 // 요청별 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
+                        // 관리자만 접근 가능
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+
+                        // 로그인한 사용자만 접근 가능
+                        .requestMatchers(
+                                "/questions/add",
+                                "/questions/edit/**",
+                                "/questions/delete/**",
+                                "/answers/**"
+                        ).authenticated()
+
+                        // 비회원 접근 가능
                         .requestMatchers(
                                 "/",
                                 "/index",
@@ -27,14 +39,11 @@ public class SecurityConfig {
                                 "/check-email",
                                 "/signup",
                                 "/login",
-                                "/questions",
+                                "/questions/**",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**"
                         ).permitAll()
-
-                        // 관리자만 접근 가능
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
 
                         // 그 외 모든 요청은 로그인 필요
                         .anyRequest().authenticated()

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.basic.bootbasic4.entity.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -22,10 +23,10 @@ public class ReportService {
     @Transactional
     public void reportQuestion(Long questionId, String username, String reason) {
         Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("회원 정보를 찾을 수 없습니다."));
 
         Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new RuntimeException("질문글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("질문글을 찾을 수 없습니다."));
 
         boolean alreadyReported =
                 reportRepository.existsByReporterMemberIdAndQuestionId(
@@ -34,7 +35,7 @@ public class ReportService {
                 );
 
         if (alreadyReported) {
-            throw new RuntimeException("이미 신고한 게시글입니다.");
+            throw new IllegalArgumentException("이미 신고한 게시글입니다.");
         }
 
         Report report = Report.builder()
@@ -50,10 +51,10 @@ public class ReportService {
     @Transactional
     public void reportAnswer(Long answerId, String username, String reason) {
         Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("회원 정보를 찾을 수 없습니다."));
 
         Answer answer = answerRepository.findById(answerId)
-                .orElseThrow(() -> new RuntimeException("답변을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("답변을 찾을 수 없습니다."));
 
         boolean alreadyReported =
                 reportRepository.existsByReporterMemberIdAndAnswerAnswerId(
@@ -62,7 +63,7 @@ public class ReportService {
                 );
 
         if (alreadyReported) {
-            throw new RuntimeException("이미 신고한 답변입니다.");
+            throw new IllegalArgumentException("이미 신고한 답변입니다.");
         }
 
         Report report = Report.builder()
@@ -86,7 +87,7 @@ public class ReportService {
     public void approveReport(Long reportId){
 
         Report report = reportRepository.findById(reportId)
-                .orElseThrow(() -> new RuntimeException("신고 내역을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("신고 내역을 찾을 수 없습니다."));
 
         report.setStatus("DELETED");
 
@@ -111,7 +112,7 @@ public class ReportService {
     @Transactional
     public void rejectReport(Long reportId) {
         Report report = reportRepository.findById(reportId)
-                .orElseThrow(() -> new RuntimeException("신고 내역을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("신고 내역을 찾을 수 없습니다."));
 
         report.setStatus("REJECTED");
     }

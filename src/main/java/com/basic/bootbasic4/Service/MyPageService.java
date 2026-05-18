@@ -8,7 +8,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +25,7 @@ public class MyPageService {
     @Transactional(readOnly = true)
     public Member getMyInfo(String username){
         return memberRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("회원정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("회원정보를 찾을 수 없습니다."));
     }
 
     // 1-1. 내가 작성한 질문 개수
@@ -42,16 +44,24 @@ public class MyPageService {
 
     // 1-3. 내가 작성한 질문 목록
     @Transactional(readOnly = true)
-    public List<Question> getMyQuestions(String username) {
-        Member member = getMyInfo(username);
+    public List<Question> getMyQuestions(Member member) {
         return questionRepository.findByMemberOrderByCreatedAtDesc(member);
     }
 
     // 1-4. 내가 작성한 답변 목록
     @Transactional(readOnly = true)
-    public List<Answer> getMyAnswers(String username) {
-        Member member = getMyInfo(username);
+    public List<Answer> getMyAnswers(Member member) {
         return answerRepository.findByMemberOrderByCreatedAtDesc(member);
+    }
+
+    // 반려동물 동거 기간 메시지 생성
+    public String getPetMessage(Member member) {
+
+        if (member.getPetStarted() == null || member.getPetType() == null) {
+            return null;
+        }
+        int petYears = LocalDate.now().getYear() - member.getPetStarted();
+        return member.getPetType() + "와 " + petYears + "년째 함께하는 중";
     }
 
     // 2. 내 정보 수정
@@ -90,7 +100,7 @@ public class MyPageService {
         Member member = getMyInfo(username);
 
         if (!passwordEncoder.matches(currentPassword, member.getPassword())){
-            throw new RuntimeException("현재 비밀번호가 일치하지 않습니다.");
+            throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
         }
 
         member.setPassword(passwordEncoder.encode(newPassword));
