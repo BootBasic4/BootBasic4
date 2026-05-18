@@ -5,6 +5,7 @@ import com.basic.bootbasic4.Service.QuestionService;
 import com.basic.bootbasic4.dto.QuestionRequestDto;
 import com.basic.bootbasic4.dto.QuestionResponseDto;
 import com.basic.bootbasic4.dto.QuestionSummaryDto;
+import com.basic.bootbasic4.entity.Member;
 import com.basic.bootbasic4.entity.QuestionCategory;
 import com.basic.bootbasic4.entity.QuestionPetType;
 import jakarta.validation.Valid;

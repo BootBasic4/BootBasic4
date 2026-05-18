@@ -18,7 +18,7 @@
                 <option value="" th:selected="${category == null}">게시판 전체</option>
                 <option th:each="cat : ${categories}"
                         th:value="${cat.name()}"
-                        th:text="${cat.displayName}"
+                        th:text="${cat.name()}"
                         th:selected="${cat == category}">카테고리</option>
             </select>
         </div>
@@ -27,7 +27,7 @@
                 <option value="" th:selected="${petType == null}">동물 전체</option>
                 <option th:each="pt : ${petTypes}"
                         th:value="${pt.name()}"
-                        th:text="${pt.displayName}"
+                        th:text="${pt.name()}"
                         th:selected="${pt == petType}">동물</option>
             </select>
         </div>
@@ -77,14 +77,13 @@
                 <th style="width:80px">게시판</th>
                 <th>제목</th>
                 <th style="width:80px">동물</th>
-                <th style="width:90px">작성자</th>
                 <th style="width:55px">조회</th>
                 <th style="width:110px">작성일</th>
             </tr>
             </thead>
             <tbody>
             <tr th:if="${questions.content.isEmpty()}">
-                <td colspan="7" class="text-center text-muted py-5">게시글이 없습니다.</td>
+                <td colspan="6" class="text-center text-muted py-5">게시글이 없습니다.</td>
             </tr>
             <tr th:each="question : ${questions.content}">
                 <td class="text-muted small" th:text="${question.id}"></td>
@@ -101,7 +100,6 @@
                     <span class="badge bg-light text-dark border"
                           th:text="${question.petType.name()}">동물</span>
                 </td>
-                <td class="small" th:text="${question.authorNickname}"></td>
                 <td class="small text-muted" th:text="${question.viewCount}"></td>
                 <td class="small text-muted"
                     th:text="${#temporals.format(question.createdAt, 'MM-dd HH:mm')}"></td>

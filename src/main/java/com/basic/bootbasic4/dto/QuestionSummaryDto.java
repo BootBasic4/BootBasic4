@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 public record QuestionSummaryDto(
     Long id,
     String title,
-    String authorNickname,
     QuestionCategory category,
     QuestionPetType petType,
     int viewCount,
@@ -18,7 +17,6 @@ public record QuestionSummaryDto(
         return new QuestionSummaryDto(
             question.getId(),
             question.getTitle(),
-            question.getMember().getNickname(),
             question.getCategory(),
             question.getPetType(),
             question.getViewCount(),
