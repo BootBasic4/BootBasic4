@@ -60,8 +60,8 @@ public class GlobalExceptionHandler {
 
     // 그 외 모든 예외
     @ExceptionHandler(Exception.class)
-    public String handleException(Model model) {
-
+    public String handleException(Exception e, Model model) {
+        e.printStackTrace();
         model.addAttribute("errorCode", ErrorCode.INTERNAL_SERVER_ERROR.getCode());
         model.addAttribute("errorMessage", ErrorCode.INTERNAL_SERVER_ERROR.getMessage());
 
