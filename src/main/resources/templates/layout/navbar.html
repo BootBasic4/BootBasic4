@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+
+<header th:fragment="navbar" class="site-header border-bottom bg-white">
+
+    <!-- ── 1행: 로고 / 검색창 / 로그인 or 닉네임 ── -->
+    <div class="container">
+        <div class="d-flex align-items-center py-2 gap-3">
+
+            <!-- 로고 -->
+            <a class="site-logo text-decoration-none text-dark fw-bold fs-4 flex-shrink-0"
+               th:href="@{/}">멍냥위키</a>
+
+            <!-- 검색창 (가운데, 최대한 늘어남) -->
+            <form class="flex-grow-1" th:action="@{/questions}" method="get" role="search">
+                <div class="search-box d-flex align-items-center border rounded px-2">
+                    <i class="bi bi-search text-secondary me-2 flex-shrink-0"></i>
+                    <input type="text" name="keyword" class="search-input border-0 w-100 py-1"
+                           placeholder="" aria-label="검색">
+                </div>
+            </form>
+
+            <!-- 비로그인: 로그인 버튼 -->
+            <div sec:authorize="isAnonymous()" class="flex-shrink-0">
+                <a th:href="@{/members/login}"
+                   class="btn btn-outline-secondary btn-sm px-3">로그인</a>
+            </div>
+
+            <!-- 로그인: 닉네임 + 알림 아이콘 -->
+            <div sec:authorize="isAuthenticated()"
+                 class="flex-shrink-0 d-flex align-items-center gap-2">
+                <a th:href="@{/members/mypage}"
+                   class="d-flex align-items-center gap-2 text-decoration-none text-dark">
+                    <!-- 프로필 원형 아이콘 -->
+                    <span class="profile-circle bg-secondary text-white rounded-circle
+                                 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-person-fill" style="font-size:1rem;"></i>
+                    </span>
+                    <!-- 닉네임 -->
+                    <span class="fw-semibold"
+                          sec:authentication="principal.nickname">닉네임</span>
+                </a>
+                <!-- 알림 벨 -->
+                <i class="bi bi-bell-fill text-warning" style="font-size:1.1rem;"></i>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ── 2행: 카테고리 메뉴 ── -->
+    <div class="container">
+        <nav class="category-nav d-flex">
+            <a th:href="@{/questions}" class="category-item">질문게시판</a>
+            <a href="#" class="category-item">분양</a>
+            <a href="#" class="category-item">꿀팁 게시판</a>
+            <a href="#" class="category-item">애완용품 나눔</a>
+            <a href="#" class="category-item">자유게시판</a>
+        </nav>
+    </div>
+
+</header>
+
+</body>
+</html>
