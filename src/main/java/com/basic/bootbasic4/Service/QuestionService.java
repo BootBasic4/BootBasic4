@@ -83,9 +83,4 @@ public class QuestionService {
                 .map(QuestionSummaryDto::from);
     }
 
-    // 7. 조회수 직접 증가 (단일 UPDATE 쿼리)
-    @Transactional
-    public void increaseViewCount(Long questionId) {
-        questionRepository.increaseViewCount(questionId);
-    }
 }
