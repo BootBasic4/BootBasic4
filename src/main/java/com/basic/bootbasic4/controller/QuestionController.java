@@ -63,6 +63,15 @@ public class QuestionController {
         return "question/detail";
     }
 
+    // (추가) 질문 등록 폼으로 이동 (GET /questions/add)
+    @GetMapping("/add")
+    public String addForm(Model model) {
+
+        model.addAttribute("dto", new QuestionRequestDto());
+
+        return "question/question_form";
+    }
+
     // 4. 질문 등록 (POST /questions/add)
     @PostMapping("/add")
     public String add(@Valid @ModelAttribute("dto") QuestionRequestDto dto,
@@ -72,12 +81,22 @@ public class QuestionController {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("category", dto.getCategory());
-            return "question/question_Form";
+            return "question/question_form";
         }
 
         Long id = questionService.addQuestion(dto, member);
         return "redirect:/questions/detail/" + id;
     }
+
+    // (추가) @GetMapping {question_form.html}
+    @GetMapping("/edit/{question_id}")
+    public String editForm(@PathVariable("question_id") Long id, Model model) {
+        QuestionResponseDto dto = questionService.getQuestionDetail(id);
+        model.addAttribute("dto", dto);
+        model.addAttribute("questionId", id);
+        return "question/question_form";
+    }
+
 
     // 5. 질문 수정 (POST /questions/edit/{question_id})
     @PostMapping("/edit/{question_id}")
