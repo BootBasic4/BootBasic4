@@ -1,8 +1,12 @@
 package com.basic.bootbasic4.Service;
 
+import com.basic.bootbasic4.Repository.MemberRepository;
 import com.basic.bootbasic4.Repository.QuestionRepository;
+import com.basic.bootbasic4.Repository.QuestionSpecification;
 import com.basic.bootbasic4.dto.QuestionRequestDto;
 import com.basic.bootbasic4.dto.QuestionResponseDto;
+import com.basic.bootbasic4.dto.QuestionSummaryDto;
+import com.basic.bootbasic4.entity.Member;
 import com.basic.bootbasic4.entity.Question;
 import com.basic.bootbasic4.entity.QuestionCategory;
 import com.basic.bootbasic4.entity.QuestionPetType;
@@ -10,6 +14,7 @@ import com.basic.bootbasic4.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,12 +24,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class QuestionService {
 
     private final QuestionRepository questionRepository;
+    private final MemberRepository memberRepository;
 
     // 1. 게시글 등록
     @Transactional
     public Long addQuestion(QuestionRequestDto dto, Member member) {
         // 1. 작성자 검증 (로그인 여부 체크)
-        if (member == null || member.getId() == null) {
+        if (member == null || member.getMemberId() == null) {
             throw new IllegalArgumentException(ErrorCode.MEMBER_NOT_LOGGED_IN.getMessage());
         }
 
@@ -34,7 +40,7 @@ public class QuestionService {
         return questionRepository.save(question).getId();
     }
 
-    // 2. 게시판별 질문 목록
+    // 2. 게시판별 질문 목록 (카테고리 + petType 필터)
     public Page<QuestionResponseDto> getListByCategory(String category, String petType, Pageable pageable) {
         QuestionCategory categoryEnum;
 
@@ -56,18 +62,19 @@ public class QuestionService {
         if (petTypeEnum == QuestionPetType.ALL) {
             questions = questionRepository.findByCategory(categoryEnum, pageable);
         } else {
+
             questions = questionRepository.findByCategoryAndPetType(categoryEnum, petTypeEnum, pageable);
         }
 
         return questions.map(QuestionResponseDto::from);
     }
 
-    // 3. 상세 조회
+    // 3. 상세 조회 + 조회수 증가
     @Transactional
     public QuestionResponseDto getQuestionDetail(Long id) {
         Question question = findQuestionById(id);
 
-        question.setViewCount(question.getViewCount() + 1);
+        questionRepository.increaseViewCount(id);
 
         return QuestionResponseDto.from(question);
     }
@@ -79,7 +86,7 @@ public class QuestionService {
 
         Question question = findQuestionById(id);
 
-        if (!question.getMember().getId().equals(currentMember.getId())) {
+        if (!question.getMember().getMemberId().equals(currentMember.getMemberId())) {
             throw new IllegalArgumentException(ErrorCode.QUESTION_UNAUTHORIZED.getMessage());
         }
 
@@ -96,17 +103,18 @@ public class QuestionService {
     public void deleteQuestion(Long id, Member currentMember) {
         Question question = findQuestionById(id);
 
-        if (!question.getMember().getId().equals(currentMember.getId())) {
+        if (!question.getMember().getMemberId().equals(currentMember.getMemberId())) {
             throw new IllegalArgumentException(ErrorCode.QUESTION_UNAUTHORIZED.getMessage());
         }
 
         questionRepository.delete(question);
     }
 
-    // 6. 통합 검색 (제목 + 내용)
-    public Page<QuestionResponseDto> searchAll(String keyword, Pageable pageable) {
-        return questionRepository.findByTitleContainingOrContentContaining(keyword, keyword, pageable)
-                .map(QuestionResponseDto::from);
+    // 6. 검색 + 필터 + 페이징 (Specification 기반)
+    public Page<QuestionSummaryDto> search(String keyword, QuestionCategory category, QuestionPetType petType, Pageable pageable) {
+        Specification<Question> spec = QuestionSpecification.withCondition(keyword, category, petType);
+        return questionRepository.findAll(spec, pageable)
+                .map(QuestionSummaryDto::from);
     }
 
 

@@ -25,7 +25,7 @@ public class QuestionResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String nickname; // 작성자 이름
-    private Integer commentCount;
+    private Integer commentCount; // 답글 수
 
 
     public static QuestionResponseDto from(Question question) {
