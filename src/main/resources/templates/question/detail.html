@@ -52,7 +52,6 @@
     <div class="comment-section">
         <h5 class="fw-bold mb-4">댓글 <span class="text-primary">0</span></h5>
 
-        <!-- 답변 목록 출력 작성 완료함-->
         <div class="comment-list">
             <div th:if="${#lists.isEmpty(answers)}">
                 <p class="text-center text-muted py-3">아직 등록된 답변이 없습니다.</p>
@@ -75,7 +74,6 @@
                 </div>
             </div>
         </div>
-        <!-- 위까지가 답변 목록-->
 
         <div class="mt-4">
             <textarea class="form-control mb-2" rows="3" placeholder="댓글을 남겨보세요"></textarea>

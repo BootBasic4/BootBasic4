@@ -2,8 +2,7 @@ package com.basic.bootbasic4.Service;
 
 import com.basic.bootbasic4.Repository.AnswerRepository;
 import com.basic.bootbasic4.dto.AnswerFormDto;
-import com.basic.bootbasic4.entity.Answer;
-import com.basic.bootbasic4.entity.Question;
+import com.basic.bootbasic4.entity.*;
 import com.basic.bootbasic4.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
