@@ -19,6 +19,8 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.NoSuchElementException;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -98,5 +100,11 @@ public class QuestionService {
     private Question findQuestionById(Long id) {
         return questionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(ErrorCode.QUESTION_NOT_FOUND.getMessage()));
+    }
+
+    // answercontroller에서 사용(질문 엔티티반환)
+    public Question getQuestion(Long id) {
+        return questionRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(ErrorCode.QUESTION_NOT_FOUND.getMessage()));
     }
 }
