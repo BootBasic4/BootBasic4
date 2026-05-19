@@ -22,13 +22,13 @@ public class SecurityConfig {
                         // 관리자만 접근 가능
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
-                        // 로그인한 사용자만 접근 가능
+                        // 일반 사용자만 접근 가능
                         .requestMatchers(
                                 "/questions/add",
                                 "/questions/edit/**",
                                 "/questions/delete/**",
                                 "/answers/**"
-                        ).authenticated()
+                        ).hasRole("USER")
 
                         // 비회원 접근 가능
                         .requestMatchers(
