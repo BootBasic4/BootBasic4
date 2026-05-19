@@ -3,6 +3,7 @@ package com.basic.bootbasic4.controller;
 
 import com.basic.bootbasic4.Service.AnswerService;
 import com.basic.bootbasic4.Service.QuestionService;
+import com.basic.bootbasic4.dto.AnswerFormDto;
 import com.basic.bootbasic4.dto.QuestionRequestDto;
 import com.basic.bootbasic4.dto.QuestionResponseDto;
 import com.basic.bootbasic4.dto.QuestionSummaryDto;
@@ -72,9 +73,9 @@ public class QuestionController {
 
         model.addAttribute("question", question);
 
-
         // 추가함
         model.addAttribute("answers", answers);
+        model.addAttribute("answerFormDto", new AnswerFormDto());
         //
 
         return "question/detail";

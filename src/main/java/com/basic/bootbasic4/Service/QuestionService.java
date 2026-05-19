@@ -10,12 +10,15 @@ import com.basic.bootbasic4.entity.Member;
 import com.basic.bootbasic4.entity.Question;
 import com.basic.bootbasic4.entity.QuestionCategory;
 import com.basic.bootbasic4.entity.QuestionPetType;
+import com.basic.bootbasic4.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -83,5 +86,11 @@ public class QuestionService {
                 .map(QuestionSummaryDto::from);
     }
 
+
+    // 답변 등록시 질문 Id로 해당 엔티티 반환
+    public Question getQuestion(Long id) {
+        return questionRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(ErrorCode.QUESTION_NOT_FOUND.getMessage()));
+    }
 }
 
