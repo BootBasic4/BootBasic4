@@ -1,6 +1,7 @@
 package com.basic.bootbasic4.entity;
 
 import jakarta.persistence.*;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -57,5 +58,4 @@ public class Answer {
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
-
 }
