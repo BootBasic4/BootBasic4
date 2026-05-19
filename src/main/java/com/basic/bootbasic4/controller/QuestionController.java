@@ -1,13 +1,14 @@
 package com.basic.bootbasic4.controller;
 
 
+import com.basic.bootbasic4.Service.AnswerService;
 import com.basic.bootbasic4.Service.QuestionService;
 import com.basic.bootbasic4.dto.QuestionRequestDto;
 import com.basic.bootbasic4.dto.QuestionResponseDto;
 import com.basic.bootbasic4.dto.QuestionSummaryDto;
-import com.basic.bootbasic4.entity.Member;
 import com.basic.bootbasic4.entity.QuestionCategory;
 import com.basic.bootbasic4.entity.QuestionPetType;
+import com.basic.bootbasic4.entity.Answer;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,8 +20,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import com.basic.bootbasic4.entity.*;
 
 import java.util.Set;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -30,13 +33,27 @@ public class QuestionController {
     private static final Set<String> ALLOWED_SORT_FIELDS = Set.of("createdAt", "viewCount", "updatedAt");
 
     private final QuestionService questionService;
+    // 답변 내역 출력을 위함
+    private final AnswerService answerService;
 
 
     // 3. 상세 조회 (GET /questions/{question_id})
     @GetMapping("/detail/{question_id}")
     public String detail(@PathVariable("question_id") Long id, Model model) {
         QuestionResponseDto question = questionService.getQuestionDetail(id);
+
+        // 답변 내역들 붙인 코드
+        List<Answer> answers = answerService.getAnswersByQuestionId(id);
+        //
+
+
         model.addAttribute("question", question);
+
+
+        // 추가함
+        model.addAttribute("answers", answers);
+        //
+
         return "question/detail";
     }
 
@@ -139,5 +156,7 @@ public class QuestionController {
 
         return "question/list";
     }
+
+
 
 }

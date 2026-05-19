@@ -2,6 +2,9 @@ package com.basic.bootbasic4.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -9,6 +12,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EntityListeners(AuditingEntityListener.class)
 public class Member {
 
     @Id
@@ -28,8 +34,9 @@ public class Member {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
+    @Builder.Default
     @Column(nullable = false, length = 20)
-    private String role;
+    private String role = "ROLE_USER";
 
     @Column(name = "pet_type", length = 50)
     private String petType;
@@ -37,11 +44,7 @@ public class Member {
     @Column(name = "pet_started")
     private Integer petStarted;
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-    }
 }
