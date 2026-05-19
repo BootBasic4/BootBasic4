@@ -64,7 +64,7 @@ public class SecurityConfig {
                             if (isAdmin) {
                                 response.sendRedirect("/admin/reports");
                             } else {
-                                response.sendRedirect("/");
+                                response.sendRedirect("/questions");
                             }
                         })
 
