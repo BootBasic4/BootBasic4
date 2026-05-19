@@ -3,6 +3,7 @@ package com.basic.bootbasic4.Service;
 import com.basic.bootbasic4.Repository.MemberRepository;
 import com.basic.bootbasic4.entity.Member;
 
+import com.basic.bootbasic4.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.core.userdetails.User;
@@ -12,6 +13,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.NoSuchElementException;
 
 
 @Service
@@ -70,4 +73,8 @@ public class MemberService implements UserDetailsService {
         return memberRepository.existsByEmail(email);
     }
 
+    public Member getMemberByUsername(String username) {
+        return memberRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException(ErrorCode.MEMBER_NOT_FOUND.getMessage()));
+    }
 }
