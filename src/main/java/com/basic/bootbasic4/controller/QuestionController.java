@@ -31,29 +31,6 @@ public class QuestionController {
 
     private final QuestionService questionService;
 
-    // 1. 게시판별 전체 조회 (GET /questions/{category})
-    @GetMapping("/{category}")
-    public String list(@PathVariable String category,
-                       @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
-                       Model model) {
-        Page<QuestionResponseDto> list = questionService.getListByCategory(category, "ALL", pageable);
-        model.addAttribute("questions", list);
-        model.addAttribute("category", category);
-        return "question/list";
-    }
-
-    // 2. 타입별 필터링 조회 (GET /questions/{category}/{pet_type})
-    @GetMapping("/{category}/{pet_type}")
-    public String filteredList(@PathVariable String category,
-                               @PathVariable String pet_type,
-                               @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
-                               Model model) {
-        Page<QuestionResponseDto> list = questionService.getListByCategory(category, pet_type, pageable);
-        model.addAttribute("questions", list);
-        model.addAttribute("category", category);
-        model.addAttribute("petType", pet_type);
-        return "question/list";
-    }
 
     // 3. 상세 조회 (GET /questions/{question_id})
     @GetMapping("/detail/{question_id}")
@@ -124,34 +101,37 @@ public class QuestionController {
     }
 
     // 7. 검색 + 정렬 + 페이징 (GET /questions?keyword=&category=&petType=&sort=&direction=&page=&size=)
-    @GetMapping
+    @GetMapping("/{category}")
     public String list(
+            @PathVariable String category,
             @RequestParam(defaultValue = "") String keyword,
-            @RequestParam(defaultValue = "") String category,
-            @RequestParam(defaultValue = "") String petType,
+            @RequestParam(defaultValue = "ALL") String petType,
             @RequestParam(defaultValue = "createdAt") String sort,
             @RequestParam(defaultValue = "desc") String direction,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             Model model
     ) {
-        if (!ALLOWED_SORT_FIELDS.contains(sort)) {
-            sort = "createdAt";
-        }
-        Sort sortObj = "asc".equalsIgnoreCase(direction)
-                ? Sort.by(sort).ascending()
-                : Sort.by(sort).descending();
 
-        QuestionCategory categoryEnum = category.isBlank() ? null : QuestionCategory.valueOf(category.toUpperCase());
-        QuestionPetType petTypeEnum = petType.isBlank() ? null : QuestionPetType.valueOf(petType.toUpperCase());
+        if (!ALLOWED_SORT_FIELDS.contains(sort)) { sort = "createdAt"; }
+        Sort sortObj = "asc".equalsIgnoreCase(direction) ? Sort.by(sort).ascending() : Sort.by(sort).descending();
+
+        // 카테고리 변환 (PathVariable 활용)
+        QuestionCategory categoryEnum = QuestionCategory.valueOf(category.toUpperCase());
+
+        // 펫타입 변환 (로직이 ALL을 걸러주므로 그대로 변환만 하면 됨)
+        // petType이 "ALL"이면 categoryEnum은 QuestionPetType.ALL이 되고,
+        // Specification이 이를 인지해서 쿼리에서 제외
+        QuestionPetType petTypeEnum = QuestionPetType.valueOf(petType.toUpperCase());
 
         Pageable pageable = PageRequest.of(page, size, sortObj);
         Page<QuestionSummaryDto> questions = questionService.search(keyword, categoryEnum, petTypeEnum, pageable);
 
+
         model.addAttribute("questions", questions);
+        model.addAttribute("category", category.toUpperCase());
+        model.addAttribute("petType", petType.toUpperCase());
         model.addAttribute("keyword", keyword);
-        model.addAttribute("category", categoryEnum);
-        model.addAttribute("petType", petTypeEnum);
         model.addAttribute("sort", sort);
         model.addAttribute("direction", direction);
         model.addAttribute("categories", QuestionCategory.values());

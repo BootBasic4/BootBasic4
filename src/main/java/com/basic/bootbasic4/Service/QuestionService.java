@@ -29,7 +29,7 @@ public class QuestionService {
     // 1. 게시글 등록
     @Transactional
     public Long addQuestion(QuestionRequestDto dto, Member member) {
-        // 1. 작성자 검증 (로그인 여부 체크)
+
         if (member == null || member.getMemberId() == null) {
             throw new IllegalArgumentException(ErrorCode.MEMBER_NOT_LOGGED_IN.getMessage());
         }
@@ -40,34 +40,6 @@ public class QuestionService {
         return questionRepository.save(question).getId();
     }
 
-    // 2. 게시판별 질문 목록 (카테고리 + petType 필터)
-    public Page<QuestionResponseDto> getListByCategory(String category, String petType, Pageable pageable) {
-        QuestionCategory categoryEnum;
-
-        try {
-            categoryEnum = QuestionCategory.valueOf(category.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(ErrorCode.QUESTION_INVALID_CATEGORY.getMessage());
-        }
-
-        QuestionPetType petTypeEnum;
-        try {
-            petTypeEnum = QuestionPetType.valueOf(petType.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(ErrorCode.INVALID_INPUT.getMessage());
-        }
-
-        Page<Question> questions;
-
-        if (petTypeEnum == QuestionPetType.ALL) {
-            questions = questionRepository.findByCategory(categoryEnum, pageable);
-        } else {
-
-            questions = questionRepository.findByCategoryAndPetType(categoryEnum, petTypeEnum, pageable);
-        }
-
-        return questions.map(QuestionResponseDto::from);
-    }
 
     // 3. 상세 조회 + 조회수 증가
     @Transactional
