@@ -43,16 +43,19 @@ public class MyPageService {
     }
 
     // 1-3. 내가 작성한 질문 목록
+    @Transactional(readOnly = true)
     public List<Question> getMyQuestions(Member member) {
         return questionRepository.findByMemberOrderByCreatedAtDesc(member);
     }
 
     // 1-4. 내가 작성한 답변 목록
+    @Transactional(readOnly = true)
     public List<Answer> getMyAnswers(Member member) {
         return answerRepository.findByMemberOrderByCreatedAtDesc(member);
     }
 
     // 반려동물 동거 기간 메시지 생성
+    @Transactional(readOnly = true)
     public String getPetMessage(Member member) {
 
         if (member.getPetStarted() == null || member.getPetType() == null) {

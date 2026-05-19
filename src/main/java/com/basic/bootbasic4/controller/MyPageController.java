@@ -95,7 +95,7 @@ public class MyPageController {
     // 4. 회원 탈퇴
     @PostMapping("/delete")
     @ResponseBody
-    public String deleteMember(Authentication authentication,
+    public ResponseEntity<String> deleteMember(Authentication authentication,
                                @RequestParam String currentPassword,
                                HttpSession session) {
 
@@ -111,10 +111,10 @@ public class MyPageController {
             // 시큐리티 인증 정보 삭제
             SecurityContextHolder.clearContext();
 
-            return "success";
+            return ResponseEntity.ok("success");
         } catch (IllegalArgumentException e) {
 
-            return "mismatch";
+            return ResponseEntity.badRequest().body("mismatch");
         }
     }
 

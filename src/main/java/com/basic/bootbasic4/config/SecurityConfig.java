@@ -7,9 +7,17 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 
 @Configuration
 public class SecurityConfig {
+
+    // 정적 리소스는 Security 필터 대상에서 제외
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return web -> web.ignoring()
+                .requestMatchers("/css/**", "/js/**", "/images/**");
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -39,10 +47,7 @@ public class SecurityConfig {
                                 "/check-email",
                                 "/signup",
                                 "/login",
-                                "/questions/**",
-                                "/css/**",
-                                "/js/**",
-                                "/images/**"
+                                "/questions/**"
                         ).permitAll()
 
                         // 그 외 모든 요청은 로그인 필요

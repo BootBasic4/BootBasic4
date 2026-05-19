@@ -34,6 +34,7 @@ public class Member {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
+    @Builder.Default
     @Column(nullable = false, length = 20)
     private String role = "ROLE_USER";
 
