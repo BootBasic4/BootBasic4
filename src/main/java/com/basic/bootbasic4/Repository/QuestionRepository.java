@@ -18,12 +18,8 @@ import java.util.List;
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Long>, JpaSpecificationExecutor<Question> {
 
-    // 3. 조회수 직접 UPDATE
-    // 3. 제목 또는 내용으로 검색
-    Page<Question> findByTitleContainingOrContentContaining(String title, String content, Pageable pageable);
-
     // 4. 조회수 직접 UPDATE
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE Question q SET q.viewCount = q.viewCount + 1 WHERE q.id = :id")
     void increaseViewCount(@Param("id") Long id);
 

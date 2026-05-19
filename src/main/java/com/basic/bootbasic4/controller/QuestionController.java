@@ -16,11 +16,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import com.basic.bootbasic4.entity.*;
+import org.springframework.security.core.userdetails.User;
 
 import java.util.Set;
 import java.util.List;
@@ -70,15 +72,19 @@ public class QuestionController {
     @PostMapping("/add")
     public String add(@Valid @ModelAttribute("dto") QuestionRequestDto dto,
                       BindingResult bindingResult,
-                      Member member,
+                      @AuthenticationPrincipal User user,
                       Model model) {
+
+        if (user == null) {
+            throw new IllegalArgumentException("로그인이 필요한 서비스입니다.");
+        }
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("category", dto.getCategory());
             return "question/question_form";
         }
 
-        Long id = questionService.addQuestion(dto, member);
+        Long id = questionService.addQuestion(dto, user.getUsername());
         return "redirect:/questions/detail/" + id;
     }
 
@@ -97,8 +103,12 @@ public class QuestionController {
     public String edit(@PathVariable("question_id") Long id,
                        @Valid @ModelAttribute("dto") QuestionRequestDto dto,
                        BindingResult bindingResult,
-                       Member member,
+                       @AuthenticationPrincipal User user,
                        Model model) {
+
+        if (user == null) {
+            throw new IllegalArgumentException("로그인이 필요한 서비스입니다.");
+        }
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("questionId", id);
@@ -106,14 +116,21 @@ public class QuestionController {
             return "question/question_form";
         }
 
-        questionService.updateQuestion(id, dto, member);
+        questionService.updateQuestion(id, dto, user.getUsername());
         return "redirect:/questions/detail/" + id;
     }
 
     // 6. 질문 삭제 (POST /questions/delete/{question_id})
     @PostMapping("/delete/{question_id}")
-    public String delete(@PathVariable("question_id") Long id, @RequestParam String category, Member member) {
-        questionService.deleteQuestion(id, member);
+    public String delete(@PathVariable("question_id") Long id,
+                         @RequestParam String category,
+                         @AuthenticationPrincipal User user) {
+
+        if (user == null) {
+            throw new IllegalArgumentException("로그인이 필요한 서비스입니다.");
+        }
+
+        questionService.deleteQuestion(id, user.getUsername());
         return "redirect:/questions/" + category;
     }
 
@@ -156,7 +173,4 @@ public class QuestionController {
 
         return "question/list";
     }
-
-
-
 }

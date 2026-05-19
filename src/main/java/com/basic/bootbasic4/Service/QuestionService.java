@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,11 +29,14 @@ public class QuestionService {
 
     // 1. 게시글 등록
     @Transactional
-    public Long addQuestion(QuestionRequestDto dto, Member member) {
+    public Long addQuestion(QuestionRequestDto dto, String username) {
 
-        if (member == null || member.getMemberId() == null) {
+        if (username == null) {
             throw new IllegalArgumentException(ErrorCode.MEMBER_NOT_LOGGED_IN.getMessage());
         }
+
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
         Question question = dto.toEntity();
         question.setMember(member);
@@ -44,9 +48,9 @@ public class QuestionService {
     // 3. 상세 조회 + 조회수 증가
     @Transactional
     public QuestionResponseDto getQuestionDetail(Long id) {
-        Question question = findQuestionById(id);
-
         questionRepository.increaseViewCount(id);
+
+        Question question = findQuestionById(id);
 
         return QuestionResponseDto.from(question);
     }
@@ -54,11 +58,11 @@ public class QuestionService {
 
     // 4. 게시글 수정
     @Transactional
-    public void updateQuestion(Long id, QuestionRequestDto dto, Member currentMember) {
+    public void updateQuestion(Long id, QuestionRequestDto dto, String currentUsername) {
 
         Question question = findQuestionById(id);
 
-        if (!question.getMember().getMemberId().equals(currentMember.getMemberId())) {
+        if (!question.getMember().getUsername().equals(currentUsername)) {
             throw new IllegalArgumentException(ErrorCode.QUESTION_UNAUTHORIZED.getMessage());
         }
 
@@ -72,10 +76,10 @@ public class QuestionService {
 
     // 5. 게시글 삭제
     @Transactional
-    public void deleteQuestion(Long id, Member currentMember) {
+    public void deleteQuestion(Long id, String currentUsername) {
         Question question = findQuestionById(id);
 
-        if (!question.getMember().getMemberId().equals(currentMember.getMemberId())) {
+        if (!question.getMember().getUsername().equals(currentUsername)) {
             throw new IllegalArgumentException(ErrorCode.QUESTION_UNAUTHORIZED.getMessage());
         }
 
