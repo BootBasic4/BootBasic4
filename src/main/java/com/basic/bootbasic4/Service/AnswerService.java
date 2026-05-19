@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -44,22 +45,35 @@ public class AnswerService {
 
     // 답변 수정
     @Transactional
-    public void edit(Long answerId, AnswerFormDto dto) {
+    public void edit(Long answerId, String username, AnswerFormDto dto) throws AccessDeniedException {
 
         // 답변 id 조회하고 없으면 에러 throw
         Answer answer = answerRepository.findById(answerId).orElseThrow(
                 ()->new NoSuchElementException(ErrorCode.ANSWER_NOT_FOUND.getMessage())
         );
-        // 있는 경우에 수정 답변 반영
+
+        // 세션의 정보와 답변 DB 에 저장된 유저 이름이 다르면 에러 throw 하는 방어 코드
+        if(!answer.getMember().getUsername().equals(username)){
+            throw new AccessDeniedException(ErrorCode.ANSWER_UNAUTHORIZED.getMessage());
+        }
+
+        // 문제 없는 경우에만 수정 답변 반영
         answer.setContent(dto.getContent());
     }
 
     // 답변 삭제
     @Transactional
-    public void delete(Long answerId) {
+    public void delete(Long answerId, String username) throws AccessDeniedException {
+
         Answer answer = answerRepository.findById(answerId).orElseThrow(
                 ()->new NoSuchElementException(ErrorCode.ANSWER_NOT_FOUND.getMessage())
         );
+
+        // 마찬가지로 삭제 권한 확인 코드(답변자 본인인지)
+        if (!answer.getMember().getUsername().equals(username)) {
+            throw new AccessDeniedException(ErrorCode.ANSWER_UNAUTHORIZED.getMessage());
+        }
+
         answerRepository.delete(answer);
     }
 }
