@@ -10,10 +10,12 @@ import com.basic.bootbasic4.entity.Member;
 import com.basic.bootbasic4.entity.Question;
 import com.basic.bootbasic4.entity.QuestionCategory;
 import com.basic.bootbasic4.entity.QuestionPetType;
+import com.basic.bootbasic4.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,40 +29,43 @@ public class QuestionService {
 
     // 1. 게시글 등록
     @Transactional
-    public Long addQuestion(QuestionRequestDto dto, Member member) {
+    public Long addQuestion(QuestionRequestDto dto, String username) {
+
+        if (username == null) {
+            throw new IllegalArgumentException(ErrorCode.MEMBER_NOT_LOGGED_IN.getMessage());
+        }
+
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
         Question question = dto.toEntity();
         question.setMember(member);
+
         return questionRepository.save(question).getId();
     }
 
-    // 2. 게시판별 질문 목록 (카테고리 + petType 필터)
-    public Page<QuestionResponseDto> getListByCategory(String category, String petType, Pageable pageable) {
-        QuestionCategory categoryEnum = QuestionCategory.valueOf(category.toUpperCase());
-
-        Page<Question> questions;
-        if (petType == null || petType.equalsIgnoreCase("ALL")) {
-            questions = questionRepository.findByCategory(categoryEnum, pageable);
-        } else {
-            QuestionPetType petTypeEnum = QuestionPetType.valueOf(petType.toUpperCase());
-            questions = questionRepository.findByCategoryAndPetType(categoryEnum, petTypeEnum, pageable);
-        }
-        return questions.map(QuestionResponseDto::from);
-    }
 
     // 3. 상세 조회 + 조회수 증가
     @Transactional
     public QuestionResponseDto getQuestionDetail(Long id) {
-        Question question = questionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + id));
         questionRepository.increaseViewCount(id);
+
+        Question question = findQuestionById(id);
+
         return QuestionResponseDto.from(question);
     }
 
+
     // 4. 게시글 수정
     @Transactional
-    public void updateQuestion(Long id, QuestionRequestDto dto) {
-        Question question = questionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + id));
+    public void updateQuestion(Long id, QuestionRequestDto dto, String currentUsername) {
+
+        Question question = findQuestionById(id);
+
+        if (!question.getMember().getUsername().equals(currentUsername)) {
+            throw new IllegalArgumentException(ErrorCode.QUESTION_UNAUTHORIZED.getMessage());
+        }
+
         question.setTitle(dto.getTitle());
         question.setContent(dto.getContent());
         question.setCategory(dto.getCategory());
@@ -68,11 +73,16 @@ public class QuestionService {
         question.setPetType(dto.getPetType());
     }
 
+
     // 5. 게시글 삭제
     @Transactional
-    public void deleteQuestion(Long id) {
-        Question question = questionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + id));
+    public void deleteQuestion(Long id, String currentUsername) {
+        Question question = findQuestionById(id);
+
+        if (!question.getMember().getUsername().equals(currentUsername)) {
+            throw new IllegalArgumentException(ErrorCode.QUESTION_UNAUTHORIZED.getMessage());
+        }
+
         questionRepository.delete(question);
     }
 
@@ -83,5 +93,10 @@ public class QuestionService {
                 .map(QuestionSummaryDto::from);
     }
 
-}
 
+    // ID로 게시글 찾기(예외 처리)
+    private Question findQuestionById(Long id) {
+        return questionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(ErrorCode.QUESTION_NOT_FOUND.getMessage()));
+    }
+}
