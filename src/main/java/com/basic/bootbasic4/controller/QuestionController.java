@@ -1,6 +1,7 @@
 package com.basic.bootbasic4.controller;
 
 
+import com.basic.bootbasic4.Repository.ReportRepository;
 import com.basic.bootbasic4.Service.AnswerService;
 import com.basic.bootbasic4.Service.QuestionService;
 import com.basic.bootbasic4.dto.AnswerFormDto;
@@ -38,6 +39,8 @@ public class QuestionController {
     private final QuestionService questionService;
     // 답변 내역 출력을 위함
     private final AnswerService answerService;
+    // 신고 기능을 위한 추가코드
+    private final ReportRepository reportRepository;
 
 
     // 3. 상세 조회 (GET /questions/{question_id})
@@ -49,8 +52,19 @@ public class QuestionController {
         List<Answer> answers = answerService.getAnswersByQuestionId(id);
         //
 
+        // 현재 게시글이 신고 처리중(PENDING) 상태인지 확인
+        boolean isReported =
+                reportRepository.existsByQuestion_IdAndStatus(id, "PENDING");
+
+        // 신고 처리중(PENDING)인 댓글 번호 목록 조회
+        List<Long> reportedAnswerIds = answers.stream()
+                .filter(answer -> reportRepository.existsByAnswer_AnswerIdAndStatus(answer.getAnswerId(), "PENDING"))
+                .map(Answer::getAnswerId)
+                .toList();
 
         model.addAttribute("question", question);
+        model.addAttribute("isReported", isReported); // 추가
+        model.addAttribute("reportedAnswerIds", reportedAnswerIds); // 추가
 
         // 추가함
         model.addAttribute("answers", answers);

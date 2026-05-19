@@ -6,4 +6,5 @@ import lombok.Data;
 // 신고 등록용
 public class ReportRequestDto  {
     private String reason;
+    private Long questionId;
 }

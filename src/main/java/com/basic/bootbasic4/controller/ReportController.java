@@ -23,7 +23,7 @@ public class ReportController {
         String username = authentication.getName();
         reportService.reportQuestion(questionId, username, dto.getReason());
 
-        return "redirect:/questions/detail/" + questionId;
+        return "redirect:/questions/detail/" + questionId + "?reported=true";
     }
 
     // 2. 답변 신고
@@ -32,7 +32,7 @@ public class ReportController {
         String username = authentication.getName();
         reportService.reportAnswer(answerId, username, dto.getReason());
 
-        return "redirect:/";
+        return "redirect:/questions/detail/" + dto.getQuestionId();
     }
 
 
