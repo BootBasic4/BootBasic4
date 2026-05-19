@@ -26,11 +26,13 @@ public class Answer {
     private String content;
 
     // 질문 고유 번호
+    // Question dto 작성되면 확인
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="question_id", nullable=false)
     private Question question;
 
     // 작성자 고유 번호
+    // Member dto 작성되면 확인
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="member_id", nullable=false)
     private Member member;
@@ -44,12 +46,14 @@ public class Answer {
     private LocalDateTime updatedAt;
 
     // insert 직전에 실행
+    // -> 현재 시간 알아서 넣어줌
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
 
     // update 직전에 실행
+    // -> 마찬가지로 현재시간 알아서 넣어줌
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();

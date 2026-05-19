@@ -24,6 +24,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long>, JpaSp
     // 2. 필터링 보기 (게시판 + 동물 종류 체크)
     Page<Question> findByCategoryAndPetType(QuestionCategory category, QuestionPetType petType, Pageable pageable);
 
+    // 3. 조회수 직접 UPDATE
     // 3. 제목 또는 내용으로 검색
     Page<Question> findByTitleContainingOrContentContaining(String title, String content, Pageable pageable);
 
