@@ -11,16 +11,18 @@ public record QuestionSummaryDto(
     QuestionCategory category,
     QuestionPetType petType,
     int viewCount,
-    LocalDateTime createdAt
+    LocalDateTime createdAt,
+    String nickname
 ) {
     public static QuestionSummaryDto from(Question question) {
         return new QuestionSummaryDto(
-            question.getId(),
-            question.getTitle(),
-            question.getCategory(),
-            question.getPetType(),
-            question.getViewCount(),
-            question.getCreatedAt()
+                question.getId(),
+                question.getTitle(),
+                question.getCategory(),
+                question.getPetType(),
+                question.getViewCount(),
+                question.getCreatedAt(),
+                question.getMember() != null ? question.getMember().getNickname() : null  // 추가
         );
     }
 }
