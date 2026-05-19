@@ -28,6 +28,10 @@ public class ReportService {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new NoSuchElementException("질문글을 찾을 수 없습니다."));
 
+        if (question.getMember().getMemberId().equals(member.getMemberId())) {
+            throw new IllegalArgumentException("본인이 작성한 게시글은 신고할 수 없습니다.");
+        }
+
         boolean alreadyReported =
                 reportRepository.existsByReporterMemberIdAndQuestionId(
                         member.getMemberId(),
@@ -55,6 +59,10 @@ public class ReportService {
 
         Answer answer = answerRepository.findById(answerId)
                 .orElseThrow(() -> new NoSuchElementException("답변을 찾을 수 없습니다."));
+
+        if (answer.getMember().getMemberId().equals(member.getMemberId())) {
+            throw new IllegalArgumentException("본인이 작성한 답변은 신고할 수 없습니다.");
+        }
 
         boolean alreadyReported =
                 reportRepository.existsByReporterMemberIdAndAnswerAnswerId(
