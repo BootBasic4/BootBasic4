@@ -31,14 +31,6 @@ public class QuestionController {
 
     private final QuestionService questionService;
 
-    // test
-    @GetMapping("/test")
-    public String testPage() {
-        // src/main/resources/templates/ 하위의 경로를 적어줍니다.
-        // 파일 확장자(.html)는 스프링 부트가 자동으로 인식하므로 생략합니다.
-        return "layout/base";
-    }
-
     // 1. 게시판별 전체 조회 (GET /questions/{category})
     @GetMapping("/{category}")
     public String list(@PathVariable String category,
