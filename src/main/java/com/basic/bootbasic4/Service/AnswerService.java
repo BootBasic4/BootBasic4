@@ -1,6 +1,7 @@
 package com.basic.bootbasic4.Service;
 
 import com.basic.bootbasic4.Repository.AnswerRepository;
+import com.basic.bootbasic4.Repository.ReportRepository;
 import com.basic.bootbasic4.dto.AnswerFormDto;
 import com.basic.bootbasic4.entity.*;
 import com.basic.bootbasic4.exception.ErrorCode;
@@ -18,6 +19,8 @@ import java.util.Optional;
 public class AnswerService {
 
     private final AnswerRepository answerRepository;
+    // 신고중인 답변인지 알아보기 위해
+    private final ReportRepository reportRepository;
 
     // 답변 등록
     @Transactional
@@ -57,6 +60,11 @@ public class AnswerService {
             throw new AccessDeniedException(ErrorCode.ANSWER_UNAUTHORIZED.getMessage());
         }
 
+        // 신고 접수 된 답변인지
+        if(reportRepository.existsByAnswer_AnswerIdAndStatus(answerId, "PENDING")) {
+            throw new IllegalArgumentException("신고된 답변은 수정할 수 없습니다.");
+        }
+
         // 문제 없는 경우에만 수정 답변 반영
         answer.setContent(dto.getContent());
     }
@@ -72,6 +80,11 @@ public class AnswerService {
         // 마찬가지로 삭제 권한 확인 코드(답변자 본인인지)
         if (!answer.getMember().getUsername().equals(username)) {
             throw new AccessDeniedException(ErrorCode.ANSWER_UNAUTHORIZED.getMessage());
+        }
+
+        // 신고 접수 된 답변인지
+        if(reportRepository.existsByAnswer_AnswerIdAndStatus(answerId, "PENDING")) {
+            throw new IllegalArgumentException("신고된 답변은 삭제할 수 없습니다.");
         }
 
         answerRepository.delete(answer);
