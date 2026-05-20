@@ -154,6 +154,7 @@ public class QuestionController {
     public String list(
             @PathVariable String category,
             @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "TITLE_CONTENT") String searchType,
             @RequestParam(defaultValue = "ALL") String petType,
             @RequestParam(defaultValue = "createdAt") String sort,
             @RequestParam(defaultValue = "desc") String direction,
@@ -174,13 +175,15 @@ public class QuestionController {
         QuestionPetType petTypeEnum = QuestionPetType.valueOf(petType.toUpperCase());
 
         Pageable pageable = PageRequest.of(page, size, sortObj);
-        Page<QuestionSummaryDto> questions = questionService.search(keyword, categoryEnum, petTypeEnum, pageable);
+        Page<QuestionSummaryDto> questions = questionService.search(keyword, searchType, categoryEnum, petTypeEnum, pageable);
 
 
         model.addAttribute("questions", questions);
         model.addAttribute("category", category.toUpperCase());
+        model.addAttribute("categoryEnum", categoryEnum);
         model.addAttribute("petType", petType.toUpperCase());
         model.addAttribute("keyword", keyword);
+        model.addAttribute("searchType", searchType);
         model.addAttribute("sort", sort);
         model.addAttribute("direction", direction);
         model.addAttribute("categories", QuestionCategory.values());
