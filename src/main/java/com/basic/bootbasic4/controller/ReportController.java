@@ -32,7 +32,7 @@ public class ReportController {
         String username = authentication.getName();
         reportService.reportAnswer(answerId, username, dto.getReason());
 
-        return "redirect:/";
+        return "redirect:/questions/detail/" + dto.getQuestionId();
     }
 
 

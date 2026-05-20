@@ -28,6 +28,10 @@ public class ReportService {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new NoSuchElementException("질문글을 찾을 수 없습니다."));
 
+        if (question.getMember().getMemberId().equals(member.getMemberId())) {
+            throw new IllegalArgumentException("본인이 작성한 게시글은 신고할 수 없습니다.");
+        }
+
         boolean alreadyReported =
                 reportRepository.existsByReporterMemberIdAndQuestionId(
                         member.getMemberId(),
@@ -55,6 +59,10 @@ public class ReportService {
 
         Answer answer = answerRepository.findById(answerId)
                 .orElseThrow(() -> new NoSuchElementException("답변을 찾을 수 없습니다."));
+
+        if (answer.getMember().getMemberId().equals(member.getMemberId())) {
+            throw new IllegalArgumentException("본인이 작성한 답변은 신고할 수 없습니다.");
+        }
 
         boolean alreadyReported =
                 reportRepository.existsByReporterMemberIdAndAnswerAnswerId(
@@ -92,12 +100,36 @@ public class ReportService {
         report.setStatus("DELETED");
 
         // 질문 신고일 경우
-        if(report.getQuestion() != null){
+        if (report.getQuestion() != null) {
             Question question = report.getQuestion();
 
-            report.setQuestion(null); // FK 연결 끊기
+            // 이 게시글에 달린 댓글들 먼저 처리
+            List<Answer> answers = answerRepository.findByQuestion_IdOrderByCreatedAtAsc(question.getId());
+
+            for (Answer answer : answers) {
+                List<Report> answerReports =
+                        reportRepository.findByAnswer_AnswerId(answer.getAnswerId());
+
+                for (Report ar : answerReports) {
+                    ar.setAnswer(null);
+                    ar.setStatus("DELETED");
+                }
+
+                answerRepository.delete(answer);
+            }
+
+            // 이 게시글을 참조하는 신고 내역 연결 끊기
+            List<Report> questionReports =
+                    reportRepository.findByQuestion_Id(question.getId());
+
+            for (Report qr : questionReports) {
+                qr.setQuestion(null);
+                qr.setStatus("DELETED");
+            }
+
             questionRepository.delete(question);
         }
+
 
         // 답변 신고일 경우
         if (report.getAnswer() != null) {
