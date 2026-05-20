@@ -14,7 +14,7 @@
 <div class="container py-5" style="max-width:900px;">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold mb-0">내 질문 목록</h2>
+        <h2 class="fw-bold mb-0">내 게시글 목록</h2>
 
         <a href="/mypage"
            class="text-decoration-none text-dark fw-semibold fs-6">
@@ -37,7 +37,7 @@
                 <tbody>
                 <tr th:if="${#lists.isEmpty(questions)}">
                     <td colspan="3" class="text-center text-muted py-5">
-                        작성한 질문이 없습니다.
+                        작성한 게시글이 없습니다.
                     </td>
                 </tr>
 
@@ -51,7 +51,7 @@
                         <a th:href="@{/questions/detail/{id}(id=${question.id})}"
                            class="text-decoration-none text-dark fw-semibold"
                            th:text="${question.title}">
-                            질문 제목
+                            게시글 제목
                         </a>
                     </td>
 

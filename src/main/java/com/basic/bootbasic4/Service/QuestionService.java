@@ -92,8 +92,8 @@ public class QuestionService {
     }
 
     // 6. 검색 + 필터 + 페이징 (Specification 기반)
-    public Page<QuestionSummaryDto> search(String keyword, QuestionCategory category, QuestionPetType petType, Pageable pageable) {
-        Specification<Question> spec = QuestionSpecification.withCondition(keyword, category, petType);
+    public Page<QuestionSummaryDto> search(String keyword, String searchType, QuestionCategory category, QuestionPetType petType, Pageable pageable) {
+        Specification<Question> spec = QuestionSpecification.withCondition(keyword, searchType, category, petType);
         return questionRepository.findAll(spec, pageable)
                 .map(QuestionSummaryDto::from);
     }
