@@ -49,6 +49,7 @@
         </form>
     </div>
 
+    <!-- // 답변 관련 코드 -->
     <div class="comment-section">
         <h5 class="fw-bold mb-4">댓글 <span class="text-primary">0</span></h5>
 
@@ -59,11 +60,17 @@
             <div th:each="answer : ${answers}" class="comment-item">
                 <div class="d-flex justify-content-between">
                     <span class="fw-bold" th:text="${answer.member.nickname}">작성자</span>
-                    <span class="text-muted" style="font-size: 0.85rem;"
-                          th:text="${#temporals.format(answer.createdAt, 'yyyy.MM.dd. HH:mm')}">날짜</span>
+                    <div>
+                        <span class="text-muted" style="font-size: 0.85rem;"
+                              th:text="${#temporals.format(answer.createdAt, 'yyyy.MM.dd. HH:mm')}">작성일</span>
+                        <span class="text-muted" style="font-size: 0.85rem;"
+                              th:if="${answer.updatedAt != null}"
+                              th:text="${' (수정: ' + #temporals.format(answer.updatedAt, 'yyyy.MM.dd. HH:mm') + ')'}">수정일</span>
+                    </div>
                 </div>
+
                 <p class="mt-2" th:text="${answer.content}">답변 내용</p>
-                <div class="d-flex gap-2">
+                <div class="d-flex gap-2" th:if="${#authentication.name == answer.member.username}">
                     <a th:href="@{/answers/edit/{answerId}(answerId=${answer.answerId}, questionId=${question.id})}"
                        class="btn btn-sm btn-outline-secondary">수정</a>
                     <form th:action="@{/answers/delete/{answerId}(answerId=${answer.answerId})}" method="post">
