@@ -160,7 +160,7 @@
                 </div>
 
                 <p class="mt-2" th:text="${answer.content}">답변 내용</p>
-                <div class="d-flex gap-2" th:if="${#authentication.name == answer.member.username}">
+                <div class="d-flex gap-2" th:if="${#authentication.name == answer.member.username and !reportedAnswerIds.contains(answer.answerId)}">
                     <a th:href="@{/answers/edit/{answerId}(answerId=${answer.answerId}, questionId=${question.id})}"
                        class="btn btn-sm btn-outline-secondary">수정</a>
                     <form th:action="@{/answers/delete/{answerId}(answerId=${answer.answerId})}" method="post">
