@@ -47,6 +47,7 @@
             <tr>
                 <th class="py-3">번호</th>
                 <th class="py-3">신고 대상</th>
+                <th class="py-3">신고 내용</th>
                 <th class="py-3">신고 사유</th>
                 <th class="py-3">신고자</th>
                 <th class="py-3">상태</th>
@@ -57,7 +58,7 @@
             <tbody>
 
             <tr th:if="${#lists.isEmpty(reports)}">
-                <td colspan="6" class="text-muted py-5">
+                <td colspan="7" class="text-muted py-5">
                     신고 내역이 없습니다.
                 </td>
             </tr>
@@ -75,6 +76,31 @@
                     class="py-3">
                     <span th:if="${report.question != null}">게시글</span>
                     <span th:if="${report.answer != null}">답변</span>
+                    <span th:if="${report.question == null and report.answer == null}">
+                        삭제된 대상
+                    </span>
+                </td>
+
+                <td class="text-start py-3"
+                    th:classappend="${report.status != 'PENDING'} ? ' text-muted'">
+
+                    <!-- 게시글 신고 -->
+                    <a th:if="${report.question != null and report.answer == null}"
+                       th:href="@{/questions/detail/{questionId}(questionId=${report.question.id})}"
+                       th:text="${#strings.abbreviate(report.question.title, 30)}"
+                       th:class="${report.status != 'PENDING'} ? 'text-decoration-none text-muted' : 'text-decoration-none text-dark'">
+                        게시글 제목
+                    </a>
+
+                    <!-- 답변 신고 -->
+                    <a th:if="${report.answer != null}"
+                       th:href="@{/questions/detail/{questionId}(questionId=${report.answer.question.id})}"
+                       th:text="${#strings.abbreviate(report.answer.content, 30)}"
+                       th:class="${report.status != 'PENDING'} ? 'text-decoration-none text-muted' : 'text-decoration-none text-dark'">
+                        답변 내용
+                    </a>
+
+                    <!-- 삭제된 대상 -->
                     <span th:if="${report.question == null and report.answer == null}">
                         삭제된 대상
                     </span>
