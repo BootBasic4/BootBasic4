@@ -59,8 +59,15 @@
             </div>
             <div th:each="answer : ${answers}" class="comment-item">
                 <div class="d-flex justify-content-between">
-                    <span class="fw-bold" th:text="${answer.member.nickname}">작성자</span>
                     <div>
+                        <span class="fw-bold" th:text="${answer.member.nickname}">작성자</span>
+                        <!-- // 반려동물 경력 표시 추가함-->
+                        <span class="text-muted ms-2" style="font-size: 0.85rem;"
+                              th:if="${answer.member.petType != null and answer.member.petStarted != null}"
+                              th:text="${answer.member.petType + '와 ' + (2026 - answer.member.petStarted) + '년째 함께하는 중'}">
+                        </span>
+                    </div>
+                        <div>
                         <span class="text-muted" style="font-size: 0.85rem;"
                               th:text="${#temporals.format(answer.createdAt, 'yyyy.MM.dd. HH:mm')}">작성일</span>
                         <span class="text-muted" style="font-size: 0.85rem;"
