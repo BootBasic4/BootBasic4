@@ -4,66 +4,135 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/base}">
 <head>
-    <title>로그인 - 멍냥위키</title>
+    <title>회원가입 - 멍냥위키</title>
 </head>
 <body>
 <th:block layout:fragment="content">
 
     <div class="auth-wrap">
-        <div class="auth-box">
+        <div class="auth-box" style="max-width:400px">
 
-            <a th:href="@{/}" class="auth-close" aria-label="닫기">
-                <i class="bi bi-x-lg"></i>
-            </a>
+            <h2 class="auth-logo" style="margin-bottom:28px">회원가입</h2>
 
-            <h2 class="auth-logo">멍냥위키</h2>
+            <form th:action="@{/signup}" method="post"
+                  th:object="${memberFormDto}" onsubmit="return validateSignupForm()">
 
-            <form th:action="@{/login}" method="post">
-
+                <!-- 아이디 -->
                 <div class="auth-field">
-                    <div class="auth-input-wrap">
-                        <span class="auth-icon"><i class="bi bi-person"></i></span>
-                        <input type="text" name="username" placeholder="아이디"
-                               required autocomplete="username">
+                    <label class="fm-label">아이디</label>
+                    <div style="display:flex;gap:8px">
+                        <input type="text" class="fm-control" id="username" name="username"
+                               placeholder="아이디 입력"
+                               oninput="resetUsernameCheck(); validateUsername()" style="flex:1">
+                        <button type="button" class="btn-gray-sm" onclick="checkUsername()">중복확인</button>
                     </div>
+                    <div id="usernameRuleText"    class="auth-hint"></div>
+                    <div id="usernameCheckResult" class="auth-hint"></div>
                 </div>
 
+                <!-- 비밀번호 -->
                 <div class="auth-field">
+                    <label class="fm-label">비밀번호</label>
                     <div class="auth-input-wrap">
-                        <span class="auth-icon"><i class="bi bi-lock"></i></span>
-                        <input type="password" id="login-pw" name="password"
-                               placeholder="비밀번호" required autocomplete="current-password">
+                        <input type="password" id="password" th:field="*{password}"
+                               class="fm-control" placeholder="비밀번호를 입력하세요"
+                               onfocus="showPasswordRuleBox()" oninput="validatePassword()" required>
                         <button type="button" class="pw-only-toggle"
-                                id="pw-toggle-btn" aria-label="비밀번호 표시">
-                            <i class="bi bi-eye-slash" id="login-pw-icon"></i>
+                                onclick="togglePassword('password', this)">
+                            <i class="bi bi-eye-slash"></i>
                         </button>
                     </div>
-                    <div th:if="${param.error}" class="auth-error">
-                        아이디 또는 비밀번호를 확인해주세요.
+                    <div id="passwordRuleBox" class="pw-rule-box" style="display:none">
+                        <div id="rule-combination" class="pw-rule fail">✗ 영문/숫자/특수문자 중 2가지 이상 포함</div>
+                        <div id="rule-length"      class="pw-rule fail">✗ 8자 이상 16자 이하 (공백 제외)</div>
+                        <div id="rule-repeat"      class="pw-rule fail">✗ 연속 3자 이상 동일한 문자/숫자 제외</div>
                     </div>
                 </div>
 
-                <button type="submit" class="auth-btn">로그인</button>
+                <!-- 비밀번호 확인 -->
+                <div class="auth-field">
+                    <label class="fm-label">비밀번호 확인</label>
+                    <div class="auth-input-wrap">
+                        <input type="password" id="confirmPassword" th:field="*{confirmPassword}"
+                               class="fm-control" placeholder="비밀번호를 다시 입력하세요"
+                               oninput="checkPasswordMatch()" required>
+                        <button type="button" class="pw-only-toggle"
+                                onclick="togglePassword('confirmPassword', this)">
+                            <i class="bi bi-eye-slash"></i>
+                        </button>
+                    </div>
+                    <div id="passwordCheckResult" class="auth-hint"></div>
+                </div>
+
+                <!-- 닉네임 -->
+                <div class="auth-field">
+                    <label class="fm-label">닉네임</label>
+                    <div style="display:flex;gap:8px">
+                        <input type="text" class="fm-control" id="nickname" name="nickname"
+                               placeholder="닉네임 입력"
+                               oninput="resetNicknameCheck(); validateNickname()" style="flex:1">
+                        <button type="button" class="btn-gray-sm" onclick="checkNickname()">중복확인</button>
+                    </div>
+                    <div id="nicknameRuleText"    class="auth-hint"></div>
+                    <div id="nicknameCheckResult" class="auth-hint"></div>
+                </div>
+
+                <!-- 이메일 -->
+                <div class="auth-field">
+                    <label class="fm-label">이메일</label>
+                    <div style="display:flex;gap:6px;align-items:center">
+                        <input type="text" id="emailId" class="fm-control"
+                               placeholder="이메일 아이디" style="flex:1"
+                               oninput="validateEmailId(); makeEmail(); resetEmailCheck()" required>
+                        <span style="color:#888">@</span>
+                        <select id="emailDomain" class="fm-control" style="width:140px"
+                                onchange="validateEmailId(); makeEmail(); resetEmailCheck()" required>
+                            <option value="">선택</option>
+                            <option value="naver.com">naver.com</option>
+                            <option value="gmail.com">gmail.com</option>
+                            <option value="daum.net">daum.net</option>
+                            <option value="kakao.com">kakao.com</option>
+                            <option value="nate.com">nate.com</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn-gray-sm" style="margin-top:6px"
+                            onclick="checkEmail()">중복확인</button>
+                    <input type="hidden" id="email" th:field="*{email}">
+                    <div id="emailIdResult"    class="auth-hint"></div>
+                    <div id="emailCheckResult" class="auth-hint"></div>
+                </div>
+
+                <!-- 반려동물 종류 -->
+                <div class="auth-field">
+                    <label class="fm-label">반려동물 종류</label>
+                    <select id="petType" th:field="*{petType}" class="fm-control">
+                        <option value="">선택 안함</option>
+                        <option value="강아지">강아지</option>
+                        <option value="고양이">고양이</option>
+                        <option value="기타">기타</option>
+                    </select>
+                </div>
+
+                <!-- 반려 시작 연도 -->
+                <div class="auth-field">
+                    <label class="fm-label">반려 시작 연도</label>
+                    <input type="number" id="petStarted" th:field="*{petStarted}"
+                           class="fm-control" placeholder="예: 2020" min="1900" max="2099">
+                </div>
+
+                <button type="submit" class="auth-btn" style="margin-top:8px">회원가입</button>
             </form>
 
             <div class="auth-links">
-                <a th:href="@{/signup}">회원가입</a>
-                <span>|</span>
-                <a th:href="@{/}">메인으로</a>
+                이미 계정이 있으신가요?
+                <a th:href="@{/login}" style="color:#3a47a8;font-weight:600">로그인</a>
             </div>
         </div>
     </div>
 
 </th:block>
 <th:block layout:fragment="scripts">
-    <script>
-        document.getElementById('pw-toggle-btn').addEventListener('click', function(){
-            var inp = document.getElementById('login-pw');
-            var ico = document.getElementById('login-pw-icon');
-            if(inp.type === 'password'){ inp.type = 'text'; ico.className = 'bi bi-eye'; }
-            else { inp.type = 'password'; ico.className = 'bi bi-eye-slash'; }
-        });
-    </script>
+    <script src="/js/signup.js"></script>
 </th:block>
 </body>
 </html>

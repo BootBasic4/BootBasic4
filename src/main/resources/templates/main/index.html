@@ -22,7 +22,7 @@
             <div class="card-grid"
                  th:if="${popularPosts != null and !popularPosts.isEmpty()}">
                 <a th:each="post : ${popularPosts}"
-                   th:href="@{/questions/{id}(id=${post.id})}"
+                   th:href="@{/questions/detail/{id}(id=${post.id})}"
                    class="card-link">
                     <!--
                         post.imagePath — 게시물 이미지 경로
@@ -105,7 +105,7 @@
                 <div class="login-links">
                     <a th:href="@{/members/find-account}">계정 찾기</a>
                     <span>|</span>
-                    <a th:href="@{/member/signup}">회원가입</a>
+                    <a th:href="@{/signup}">회원가입</a>
                 </div>
             </div>
 
@@ -130,7 +130,7 @@
             </div>
 
             <!-- 인기 랭킹 -->
-            <div class="rank-box">
+           <!-- <div class="rank-box">
                 <div class="rank-title">인기 랭킹</div>
                 <div th:if="${rankingList != null and !rankingList.isEmpty()}">
                     <div th:each="item, stat : ${rankingList}"
@@ -144,7 +144,7 @@
                     </span>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
         </aside>
     </div>

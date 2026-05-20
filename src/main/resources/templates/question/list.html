@@ -66,14 +66,16 @@
             <a th:each="q : ${questions.content}"
                th:href="@{/questions/detail/{id}(id=${q.id})}"
                class="post-row">
+                <div class="post-thumb"></div>
+                <!-- 이미지url 생성 후 해제
                 <div class="post-thumb">
                     <img th:if="${q.imageUrl != null}"
                          th:src="${q.imageUrl}" th:alt="${q.title}"
-                         onerror="this.parentNode.dataset.empty='true'">
-                </div>
+                         onerror="this.parentNode.dataset.empty='true'"> -->
+
                 <div class="post-mid">
                     <div class="post-top">
-                        <span class="pet-tag" th:text="${q.petType.label}">동물</span>
+                        <span class="pet-tag" th:text="${q.petType != null ? q.petType.label : ''}"></span>
                         <span class="td-muted" th:text="'#' + ${q.boardSeq}"></span>
                     </div>
                     <div class="post-title post-title-link" th:text="${q.title}">제목</div>
