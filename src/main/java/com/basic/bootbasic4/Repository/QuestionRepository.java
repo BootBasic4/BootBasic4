@@ -18,14 +18,18 @@ import java.util.List;
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Long>, JpaSpecificationExecutor<Question> {
 
-    // 4. 조회수 직접 UPDATE
+    // 1. 조회수 직접 UPDATE
     @Modifying(clearAutomatically = true)
     @Query("UPDATE Question q SET q.viewCount = q.viewCount + 1 WHERE q.id = :id")
     void increaseViewCount(@Param("id") Long id);
 
-    // 5. 내가 작성한 질문 개수
+    // 2. 내가 작성한 질문 개수
     long countByMember(Member member);
 
-    // 6. 내가 작성한 질문 목록
+    // 3. 내가 작성한 질문 목록
     List<Question> findByMemberOrderByCreatedAtDesc(Member member);
+
+    // 4. 게시글 번호
+    @Query("SELECT COALESCE(MAX(q.boardSeq), 0) FROM Question q WHERE q.category = :category")
+    int findMaxBoardSeqByCategory(@Param("category") QuestionCategory category);
 }

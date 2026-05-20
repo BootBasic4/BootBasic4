@@ -103,7 +103,7 @@
                         <td colspan="6" class="text-center text-muted py-5">등록된 게시글이 없습니다.</td>
                     </tr>
                     <tr th:each="q : ${questions.content}">
-                        <td class="text-muted small" th:text="${q.id}"></td>
+                        <td class="text-muted small" th:text="${q.boardSeq}"></td>
                         <td>
                             <span class="badge bg-light text-dark border"
                                   th:text="${q.petType.label}">동물</span>
