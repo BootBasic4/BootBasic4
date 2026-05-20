@@ -62,75 +62,75 @@ VALUES
 -- CAT : 고양이
 
 INSERT INTO question
-(title, content, member_id, category, pet_type, image_url, view_count, created_at, updated_at)
+(title, content, member_id, category, pet_type, image_url, view_count, board_seq, created_at, updated_at)
 VALUES
 ('강아지가 밥을 잘 안 먹어요',
  '최근에 사료를 잘 안 먹는데 어떻게 해야 할까요? 너무 걱정됩니다.',
- 3, 'QUESTION', 'DOG', NULL, 12, NOW(), NULL),
+ 3, 'QUESTION', 'DOG', NULL, 12,1, NOW(), NULL),
 
 ('고양이 모래 냄새 줄이는 방법 공유합니다',
  '화장실 위치를 통풍이 잘 되는 곳으로 옮기고 모래를 주기적으로 교체하니 냄새가 많이 줄었습니다.',
- 2, 'TIP', 'CAT', NULL, 25, NOW(), NULL),
+ 2, 'TIP', 'CAT', NULL, 25,1, NOW(), NULL),
 
 ('강아지 장난감 나눔합니다',
  '사용감은 조금 있지만 충분히 깨끗하게 사용 가능합니다. 필요하신 분 댓글 주세요.',
- 1, 'SHARE', 'DOG', '/images/share-dog-toy.jpg', 18, NOW(), NULL),
+ 1, 'SHARE', 'DOG', '/images/share-dog-toy.jpg', 18,1, NOW(), NULL),
 
 ('고양이 분양합니다',
  '러시안블루 고양이 11개월, 중성화 X. 책임감 있게 키워주실 분을 찾습니다.',
- 2, 'ADOPTION', 'CAT', '/images/adoption-cat.jpg', 30, NOW(), NULL),
+ 2, 'ADOPTION', 'CAT', '/images/adoption-cat.jpg', 30,1, NOW(), NULL),
 
 ('반려동물 키우는 분들 자유롭게 소통해요',
  '강아지나 고양이 키우면서 생긴 일상 이야기 자유롭게 나눠요.',
- 1, 'FREE', 'CAT', NULL, 7, NOW(), NULL),
+ 1, 'FREE', 'CAT', NULL, 7,1, NOW(), NULL),
 
 ('산책할 때 배변봉투 꼭 챙기세요',
  '펫티켓을 지키기 위해 산책 시 배변봉투와 물티슈를 챙기는 습관이 중요합니다.',
- 1, 'TIP', 'DOG', NULL, 21, NOW(), NULL),
+ 1, 'TIP', 'DOG', NULL, 21,2, NOW(), NULL),
 
 ('강아지가 산책 중에 계속 짖어요',
  '다른 강아지를 보면 계속 짖는데 훈련 방법이 있을까요?',
- 3, 'QUESTION', 'DOG', NULL, 9, NOW(), NULL),
+ 3, 'QUESTION', 'DOG', NULL, 9,2, NOW(), NULL),
 
  ('고양이가 새벽마다 울어요',
  '새벽만 되면 계속 울어서 잠을 못 자고 있습니다. 이유가 뭘까요?',
- 2, 'QUESTION', 'CAT', NULL, 14, NOW(), NULL),
+ 2, 'QUESTION', 'CAT', NULL, 14,3, NOW(), NULL),
 
 ('강아지 배변 훈련 팁 공유',
  '배변 패드를 일정 위치에 두고 성공할 때마다 간식 보상을 주는 방식이 효과적이었습니다.',
- 1, 'TIP', 'DOG', NULL, 19, NOW(), NULL),
+ 1, 'TIP', 'DOG', NULL, 19, 3, NOW(), NULL),
 
 ('사용하던 고양이 캣타워 나눔합니다',
  '이사 때문에 사용하던 캣타워 무료 나눔합니다.',
- 2, 'SHARE', 'CAT', '/images/cat-tower.jpg', 11, NOW(), NULL),
+ 2, 'SHARE', 'CAT', '/images/cat-tower.jpg', 11, 2, NOW(), NULL),
 
 ('반려동물 병원 추천 부탁드립니다',
  '강아지 슬개골 수술 잘하는 병원 추천 부탁드립니다.',
- 3, 'QUESTION', 'DOG', NULL, 27, NOW(), NULL),
+ 3, 'QUESTION', 'DOG', NULL, 27,4, NOW(), NULL),
 
 ('강아지 유모차 분양합니다',
  '실사용 3개월 정도 사용했고 상태 좋습니다.',
- 1, 'ADOPTION', 'DOG', '/images/dog-stroller.jpg', 8, NOW(), NULL),
+ 1, 'ADOPTION', 'DOG', '/images/dog-stroller.jpg', 8,2, NOW(), NULL),
 
 ('반려동물 키우면 가장 행복한 순간',
  '다들 언제 가장 행복하신가요? 저는 퇴근하고 반겨줄 때요.',
- 1, 'FREE', 'DOG', NULL, 22, NOW(), NULL),
+ 1, 'FREE', 'DOG', NULL, 22,2, NOW(), NULL),
 
 ('고양이 털 관리 방법 알려주세요',
  '장모종 고양이라 털 빠짐이 심한데 관리 팁 있을까요?',
- 2, 'QUESTION', 'CAT', NULL, 17, NOW(), NULL),
+ 2, 'QUESTION', 'CAT', NULL, 17,5, NOW(), NULL),
 
 ('산책 전 체크해야 하는 것들',
  '여름철 산책 시 바닥 온도 꼭 확인하세요!',
- 1, 'TIP', 'DOG', NULL, 31, NOW(), NULL),
+ 1, 'TIP', 'DOG', NULL, 31,4, NOW(), NULL),
 
 ('강아지 간식 추천 부탁드립니다',
  '알러지 없는 건강한 간식 추천해주세요.',
- 3, 'QUESTION', 'DOG', NULL, 6, NOW(), NULL),
+ 3, 'QUESTION', 'DOG', NULL, 6,6, NOW(), NULL),
 
 ('고양이 자동 급식기 사용 후기',
  '자동 급식기 사용 후 규칙적인 식사가 가능해졌어요.',
- 2, 'TIP', 'CAT', NULL, 13, NOW(), NULL);
+ 2, 'TIP', 'CAT', NULL, 13,5, NOW(), NULL);
 
 
 
