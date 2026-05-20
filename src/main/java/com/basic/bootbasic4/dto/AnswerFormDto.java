@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class AnswerFormDto {
 
     // 등록/조회/수정
-    @NotBlank(message="답변 내용 입력해주세요")
+    @NotBlank(message="답변 내용을 입력해주세요")
     private String content;
 
     // 등록/조회
