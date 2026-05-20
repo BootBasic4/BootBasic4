@@ -13,16 +13,22 @@ public class QuestionSpecification {
 
     private QuestionSpecification() {}
 
-    public static Specification<Question> withCondition(String keyword, QuestionCategory category, QuestionPetType petType) {
+    public static Specification<Question> withCondition(String keyword, String searchType, QuestionCategory category, QuestionPetType petType) {
         return (root, query, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             if (keyword != null && !keyword.isBlank()) {
                 String pattern = "%" + keyword.trim() + "%";
-                predicates.add(builder.or(
-                    builder.like(root.get("title"), pattern),
-                    builder.like(root.get("content"), pattern)
-                ));
+                if ("TITLE".equals(searchType)) {
+                    predicates.add(builder.like(root.get("title"), pattern));
+                } else if ("CONTENT".equals(searchType)) {
+                    predicates.add(builder.like(root.get("content"), pattern));
+                } else {
+                    predicates.add(builder.or(
+                        builder.like(root.get("title"), pattern),
+                        builder.like(root.get("content"), pattern)
+                    ));
+                }
             }
 
             if (category != null) {
