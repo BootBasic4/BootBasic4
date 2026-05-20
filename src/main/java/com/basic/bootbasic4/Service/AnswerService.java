@@ -87,6 +87,12 @@ public class AnswerService {
             throw new IllegalArgumentException("신고된 답변은 삭제할 수 없습니다.");
         }
 
+        // 신고 내역의 answer 참조 끊기
+        List<Report> reports = reportRepository.findByAnswer_AnswerId(answerId);
+        for (Report report : reports) {
+            report.setAnswer(null);
+        }
+
         answerRepository.delete(answer);
     }
 }
