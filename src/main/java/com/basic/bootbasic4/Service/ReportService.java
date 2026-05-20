@@ -104,7 +104,7 @@ public class ReportService {
             Question question = report.getQuestion();
 
             // 이 게시글에 달린 댓글들 먼저 처리
-            List<Answer> answers = answerRepository.findByQuestion_Id(question.getId());
+            List<Answer> answers = answerRepository.findByQuestion_IdOrderByCreatedAtAsc(question.getId());
 
             for (Answer answer : answers) {
                 List<Report> answerReports =

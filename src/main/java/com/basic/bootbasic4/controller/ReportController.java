@@ -23,7 +23,7 @@ public class ReportController {
         String username = authentication.getName();
         reportService.reportQuestion(questionId, username, dto.getReason());
 
-        return "redirect:/questions/detail/" + questionId + "?reported=true";
+        return "redirect:/questions/detail/" + questionId;
     }
 
     // 2. 답변 신고

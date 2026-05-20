@@ -14,9 +14,6 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
     // 내가 작성한 답변 목록
     List<Answer> findByMemberOrderByCreatedAtDesc(Member member);
 
-    // 특정 게시글에 작성된 전체 댓글 조회
-    List<Answer> findByQuestion_Id(Long questionId);
-
     // save -> 답변 저장
     // findById -> 수정하고 삭제할때 특정 답변하나 가져오는거 필요
     // delete -> 답변 삭제
