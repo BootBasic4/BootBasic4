@@ -26,6 +26,9 @@ public class Question {
     @Column(name = "question_id")
     private Long id;
 
+    @Column(name = "board_seq", nullable = false, columnDefinition = "INT DEFAULT 1")
+    private Integer boardSeq;
+
     @Column(nullable = false, length = 200)
     private String title;
 

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>마이페이지 - 멍냥위키</title>
+</head>
+<body>
+<th:block layout:fragment="content">
+
+    <div class="page-wrap" style="max-width:1000px">
+        <div style="display:grid;grid-template-columns:220px minmax(0,1fr);gap:28px">
+
+            <!-- 좌측 프로필 -->
+            <div class="mp-side">
+                <div class="mp-avatar-wrap">
+                    <div class="mp-avatar">
+                        <span th:if="${member.petType == '강아지'}">🐶</span>
+                        <span th:if="${member.petType == '고양이'}">🐱</span>
+                        <span th:if="${member.petType != '강아지' and member.petType != '고양이'}">🐾</span>
+                    </div>
+                    <div class="mp-nickname" th:text="${member.nickname}">닉네임</div>
+                    <div class="mp-pet-msg" th:if="${petMessage != null}" th:text="${petMessage + ' 🏠'}">5년차 동거중</div>
+                </div>
+                <a th:href="@{/}" class="mp-home-link">
+                    <i class="bi bi-house-door-fill"></i> 메인으로
+                </a>
+            </div>
+
+            <!-- 우측 콘텐츠 -->
+            <div>
+
+                <!-- 내 프로필 -->
+                <h4 class="mp-section-title">내 프로필</h4>
+                <div class="mp-card">
+                    <div class="mp-row">
+                        <span class="mp-label">아이디</span>
+                        <span class="mp-val" th:text="${member.username}">user1</span>
+                    </div>
+                    <div class="mp-row">
+                        <span class="mp-label">닉네임</span>
+                        <span class="mp-val" th:text="${member.nickname}">닉네임</span>
+                        <button class="mp-edit-btn" data-bs-toggle="modal" data-bs-target="#nicknameModal">수정</button>
+                    </div>
+                    <div class="mp-row">
+                        <span class="mp-label">이메일</span>
+                        <span class="mp-val" th:text="${member.email}">email@test.com</span>
+                        <button class="mp-edit-btn" data-bs-toggle="modal" data-bs-target="#emailModal">수정</button>
+                    </div>
+                    <div class="mp-row">
+                        <span class="mp-label">반려동물</span>
+                        <span class="mp-val" th:text="${member.petType}">강아지</span>
+                    </div>
+                    <div class="mp-row" style="border-bottom:none">
+                        <span class="mp-label">반려 시작</span>
+                        <span class="mp-val" th:text="${member.petStarted + '년'}">2018년</span>
+                    </div>
+                </div>
+
+                <!-- 내 활동 -->
+                <h4 class="mp-section-title">내 활동</h4>
+                <div class="mp-card">
+                    <a th:href="@{/mypage/questions}" class="mp-activity-row">
+                        <div>
+                            <div class="mp-act-title">내가 쓴 게시글</div>
+                            <div class="mp-act-desc">작성한 질문 게시글을 확인할 수 있어요</div>
+                        </div>
+                        <span class="mp-act-count"><span th:text="${questionCount}">0</span>개</span>
+                    </a>
+                    <a th:href="@{/mypage/answers}" class="mp-activity-row" style="border-bottom:none">
+                        <div>
+                            <div class="mp-act-title">내가 쓴 댓글</div>
+                            <div class="mp-act-desc">작성한 답변 댓글을 확인할 수 있어요</div>
+                        </div>
+                        <span class="mp-act-count"><span th:text="${answerCount}">0</span>개</span>
+                    </a>
+                </div>
+
+                <!-- 계정 관리 -->
+                <h4 class="mp-section-title">계정 관리</h4>
+                <div class="mp-card">
+                    <button class="mp-manage-row" data-bs-toggle="modal" data-bs-target="#passwordModal">
+                        <span>비밀번호 변경</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                    <button class="mp-manage-row" style="color:#e74c3c;border-bottom:none"
+                            data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <span>회원 탈퇴</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 모달: 닉네임 수정 ===== -->
+    <div class="modal fade" id="nicknameModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered" style="max-width:400px">
+            <div class="modal-content mp-modal">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">닉네임 변경</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="/mypage/nickname" method="post">
+                    <div class="modal-body">
+                        <input type="text" name="nickname" class="fm-control" placeholder="새 닉네임"
+                               oninput="checkMypageNickname()" required>
+                        <div id="mypageNicknameResult" class="auth-hint mt-2"></div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn-text-dark" data-bs-dismiss="modal">취소</button>
+                        <button type="submit" class="btn-text-accent">변경하기</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 모달: 이메일 수정 ===== -->
+    <div class="modal fade" id="emailModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered" style="max-width:400px">
+            <div class="modal-content mp-modal">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">이메일 변경</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="/mypage/email" method="post">
+                    <div class="modal-body">
+                        <input type="email" name="email" class="fm-control" placeholder="새 이메일"
+                               oninput="checkMypageEmail()" required>
+                        <div class="auth-hint mt-1">이메일 형식에 맞게 입력해주세요.</div>
+                        <div id="mypageEmailResult" class="auth-hint mt-1"></div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn-text-dark" data-bs-dismiss="modal">취소</button>
+                        <button type="submit" class="btn-text-accent">변경하기</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 모달: 비밀번호 변경 ===== -->
+    <div class="modal fade" id="passwordModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered" style="max-width:400px">
+            <div class="modal-content mp-modal">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">비밀번호 변경</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="passwordForm" action="/mypage/password" method="post"
+                      onsubmit="return validatePasswordModal()">
+                    <div class="modal-body" style="display:flex;flex-direction:column;gap:10px">
+                        <div class="auth-input-wrap">
+                            <input type="password" id="currentPassword" name="currentPassword"
+                                   class="fm-control" placeholder="현재 비밀번호" required>
+                            <button type="button" class="pw-only-toggle"
+                                    onclick="togglePassword('currentPassword', this)">
+                                <i class="bi bi-eye-slash"></i>
+                            </button>
+                        </div>
+                        <div id="currentPasswordResult" class="auth-hint text-danger"></div>
+                        <div class="auth-input-wrap">
+                            <input type="password" id="newPassword" name="newPassword"
+                                   class="fm-control" placeholder="새 비밀번호"
+                                   onfocus="showPasswordRuleBox()" oninput="validateMypagePassword()" required>
+                            <button type="button" class="pw-only-toggle"
+                                    onclick="togglePassword('newPassword', this)">
+                                <i class="bi bi-eye-slash"></i>
+                            </button>
+                        </div>
+                        <div id="passwordRuleBox" class="pw-rule-box" style="display:none">
+                            <div id="rule-combination" class="pw-rule fail">✗ 영문/숫자/특수문자 중 2가지 이상 포함</div>
+                            <div id="rule-length"      class="pw-rule fail">✗ 8자 이상 16자 이하</div>
+                            <div id="rule-repeat"      class="pw-rule fail">✗ 연속 3자 이상 동일한 문자/숫자 제외</div>
+                        </div>
+                        <div class="auth-input-wrap">
+                            <input type="password" id="confirmNewPassword" name="confirmNewPassword"
+                                   class="fm-control" placeholder="새 비밀번호 확인"
+                                   oninput="checkMypagePasswordMatch()" required>
+                            <button type="button" class="pw-only-toggle"
+                                    onclick="togglePassword('confirmNewPassword', this)">
+                                <i class="bi bi-eye-slash"></i>
+                            </button>
+                        </div>
+                        <div id="passwordMatchResult"  class="auth-hint text-danger"></div>
+                        <div id="passwordModalResult"  class="auth-hint"></div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn-text-dark" data-bs-dismiss="modal">취소</button>
+                        <button type="submit" class="btn-text-accent">변경하기</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 모달: 회원 탈퇴 ===== -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered" style="max-width:400px">
+            <div class="modal-content mp-modal">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold" style="color:#e74c3c">회원 탈퇴</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="/mypage/delete" method="post" onsubmit="return deleteMember(event)">
+                    <div class="modal-body">
+                        <p class="auth-hint mb-3">탈퇴를 진행하려면 비밀번호를 입력해주세요.</p>
+                        <input type="password" id="deleteCurrentPassword" name="currentPassword"
+                               class="fm-control" placeholder="비밀번호" required>
+                        <div id="deleteResult" class="auth-hint mt-2"></div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn-text-dark" data-bs-dismiss="modal">취소</button>
+                        <button type="submit" class="btn-text-danger">탈퇴하기</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</th:block>
+<th:block layout:fragment="scripts">
+    <script src="/js/mypage.js"></script>
+</th:block>
+</body>
+</html>

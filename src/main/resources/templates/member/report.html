@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>신고 관리 - 멍냥위키</title>
+</head>
+<body>
+<th:block layout:fragment="content">
+
+    <div class="page-wrap">
+
+        <div class="mp-list-head">
+            <h2 class="bd-title">관리자 페이지</h2>
+            <form th:action="@{/logout}" method="post" style="margin:0">
+                <button type="submit" class="btn-l">로그아웃</button>
+            </form>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+            <span class="fm-label" style="margin:0;white-space:nowrap">신고 목록</span>
+            <select id="reportFilter" class="fm-control" style="width:130px"
+                    onchange="filterReports()">
+                <option value="ALL">전체 신고</option>
+                <option value="PENDING">처리 대기</option>
+                <option value="DELETED">승인 완료</option>
+                <option value="REJECTED">반려 목록</option>
+            </select>
+        </div>
+
+        <div style="overflow-x:auto">
+            <table class="board-table">
+                <thead>
+                <tr>
+                    <th style="width:60px;text-align:center">번호</th>
+                    <th style="width:80px;text-align:center">신고 대상</th>
+                    <th>신고 내용</th>
+                    <th>신고 사유</th>
+                    <th style="width:100px;text-align:center">신고자</th>
+                    <th style="width:70px;text-align:center">상태</th>
+                    <th style="width:120px;text-align:center">처리</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(reports)}">
+                    <td colspan="7" class="board-empty">신고 내역이 없습니다.</td>
+                </tr>
+                <tr th:each="report : ${reports}"
+                    th:attr="data-status=${report.status}">
+                    <td class="td-muted" style="text-align:center"
+                        th:text="${report.reportId}">1</td>
+                    <td style="text-align:center">
+                        <span class="pet-tag" th:if="${report.question != null}">게시글</span>
+                        <span class="pet-tag" th:if="${report.answer != null}">답변</span>
+                        <span class="td-muted"
+                              th:if="${report.question == null and report.answer == null}">삭제됨</span>
+                    </td>
+                    <td>
+                        <a th:if="${report.question != null and report.answer == null}"
+                           th:href="@{/questions/detail/{id}(id=${report.question.id})}"
+                           th:text="${#strings.abbreviate(report.question.title, 30)}"
+                           th:classappend="${report.status != 'PENDING'} ? 'td-muted' : 'td-title'"></a>
+                        <a th:if="${report.answer != null}"
+                           th:href="@{/questions/detail/{id}(id=${report.answer.question.id})}"
+                           th:text="${#strings.abbreviate(report.answer.content, 30)}"
+                           th:classappend="${report.status != 'PENDING'} ? 'td-muted' : 'td-title'"></a>
+                        <span th:if="${report.question == null and report.answer == null}"
+                              class="td-muted">삭제된 대상</span>
+                    </td>
+                    <td>
+                        <a th:if="${report.question != null}"
+                           th:href="@{/questions/detail/{id}(id=${report.question.id})}"
+                           th:text="${report.reason}"
+                           th:classappend="${report.status != 'PENDING'} ? 'td-muted' : 'td-title'"></a>
+                        <a th:if="${report.answer != null}"
+                           th:href="@{/questions/detail/{id}(id=${report.answer.question.id})}"
+                           th:text="${report.reason}"
+                           th:classappend="${report.status != 'PENDING'} ? 'td-muted' : 'td-title'"></a>
+                        <span th:if="${report.question == null and report.answer == null}"
+                              th:text="${report.reason}" class="td-muted"></span>
+                    </td>
+                    <td class="td-muted" style="text-align:center"
+                        th:text="${report.reporter.username}">신고자</td>
+                    <td style="text-align:center">
+                        <span class="pet-tag" th:if="${report.status == 'PENDING'}">대기</span>
+                        <span class="td-muted"  th:if="${report.status == 'DELETED'}">승인</span>
+                        <span class="td-muted"  th:if="${report.status == 'REJECTED'}">반려</span>
+                    </td>
+                    <td style="text-align:center">
+                        <div th:if="${report.status == 'PENDING'}"
+                             style="display:flex;justify-content:center;gap:6px">
+                            <form th:action="@{/admin/reports/{id}/delete(id=${report.reportId})}"
+                                  method="post">
+                                <button type="submit" class="admin-btn-ok">승인</button>
+                            </form>
+                            <form th:action="@{/admin/reports/{id}/reject(id=${report.reportId})}"
+                                  method="post">
+                                <button type="submit" class="admin-btn-reject">반려</button>
+                            </form>
+                        </div>
+                        <span th:if="${report.status != 'PENDING'}" class="td-muted">처리완료</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</th:block>
+<th:block layout:fragment="scripts">
+    <script>
+        function filterReports(){
+            var sel = document.getElementById('reportFilter').value;
+            document.querySelectorAll('tr[data-status]').forEach(function(row){
+                row.style.display = (sel==='ALL' || sel===row.dataset.status) ? '' : 'none';
+            });
+        }
+    </script>
+</th:block>
+</body>
+</html>

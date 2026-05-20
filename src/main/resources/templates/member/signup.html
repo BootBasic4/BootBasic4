@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>로그인 - 멍냥위키</title>
+</head>
+<body>
+<th:block layout:fragment="content">
+
+    <div class="auth-wrap">
+        <div class="auth-box">
+
+            <a th:href="@{/}" class="auth-close" aria-label="닫기">
+                <i class="bi bi-x-lg"></i>
+            </a>
+
+            <h2 class="auth-logo">멍냥위키</h2>
+
+            <form th:action="@{/login}" method="post">
+
+                <div class="auth-field">
+                    <div class="auth-input-wrap">
+                        <span class="auth-icon"><i class="bi bi-person"></i></span>
+                        <input type="text" name="username" placeholder="아이디"
+                               required autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="auth-field">
+                    <div class="auth-input-wrap">
+                        <span class="auth-icon"><i class="bi bi-lock"></i></span>
+                        <input type="password" id="login-pw" name="password"
+                               placeholder="비밀번호" required autocomplete="current-password">
+                        <button type="button" class="pw-only-toggle"
+                                id="pw-toggle-btn" aria-label="비밀번호 표시">
+                            <i class="bi bi-eye-slash" id="login-pw-icon"></i>
+                        </button>
+                    </div>
+                    <div th:if="${param.error}" class="auth-error">
+                        아이디 또는 비밀번호를 확인해주세요.
+                    </div>
+                </div>
+
+                <button type="submit" class="auth-btn">로그인</button>
+            </form>
+
+            <div class="auth-links">
+                <a th:href="@{/signup}">회원가입</a>
+                <span>|</span>
+                <a th:href="@{/}">메인으로</a>
+            </div>
+        </div>
+    </div>
+
+</th:block>
+<th:block layout:fragment="scripts">
+    <script>
+        document.getElementById('pw-toggle-btn').addEventListener('click', function(){
+            var inp = document.getElementById('login-pw');
+            var ico = document.getElementById('login-pw-icon');
+            if(inp.type === 'password'){ inp.type = 'text'; ico.className = 'bi bi-eye'; }
+            else { inp.type = 'password'; ico.className = 'bi bi-eye-slash'; }
+        });
+    </script>
+</th:block>
+</body>
+</html>

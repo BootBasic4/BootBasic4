@@ -25,7 +25,8 @@ public class QuestionResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String nickname; // 작성자 이름
-    private Integer commentCount;
+    private String username; // 작성자 아이디 추가
+    private Integer commentCount; // 답글 수
 
 
     public static QuestionResponseDto from(Question question) {
@@ -39,6 +40,7 @@ public class QuestionResponseDto {
                 .viewCount(question.getViewCount())
                 .createdAt(question.getCreatedAt())
                 .nickname(question.getMember().getNickname())
+                .username(question.getMember().getUsername())
                 .commentCount(question.getAnswers() != null ? question.getAnswers().size() : 0)
                 .build();
 

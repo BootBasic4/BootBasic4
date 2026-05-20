@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>멍냥위키</title>
+</head>
+
+<body>
+<th:block layout:fragment="content">
+
+    <div class="home-wrap">
+
+        <!-- ===== 좌측: 메인 콘텐츠 ===== -->
+        <div class="home-main">
+
+            <!-- 이번 주 인기 게시물 -->
+            <h2 class="section-title">이번 주 인기 게시물</h2>
+
+            <div class="card-grid"
+                 th:if="${popularPosts != null and !popularPosts.isEmpty()}">
+                <a th:each="post : ${popularPosts}"
+                   th:href="@{/questions/{id}(id=${post.id})}"
+                   class="card-link">
+                    <!--
+                        post.imagePath — 게시물 이미지 경로
+                        없으면 placeholder 표시
+                    -->
+                   <!-- <div class="card-thumb">
+                        <img th:if="${post.imageUrl != null}"
+                             th:src="@{${post.imagePath}}"
+                            th:alt="${post.title}"
+                             onerror="this.parentNode.dataset.empty='true'">
+                    </div>-->
+                    <div class="card-thumb"></div>
+                    <div class="card-txt" th:text="${post.title}">제목</div>
+                    <div class="card-meta">
+                        <span th:text="${post.category }">게시판</span> ·
+                        조회 <span th:text="${post.viewCount}">0</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- 인기 게시물 없을 때 -->
+            <div th:if="${popularPosts == null or popularPosts.isEmpty()}"
+                 class="empty-msg">등록된 게시물이 없습니다.</div>
+
+            <!-- 최근 질문 -->
+            <h2 class="section-title" style="margin-top:28px">최근 질문</h2>
+
+            <div class="recent-list"
+                 th:if="${recentQuestions != null and !recentQuestions.isEmpty()}">
+                <a th:each="q : ${recentQuestions}"
+                   th:href="@{/questions/{id}(id=${q.id})}"
+                   class="recent-item">
+                    <span class="recent-txt" th:text="${q.title}">제목</span>
+                    <span class="recent-time"
+                          th:text="${#temporals.format(q.createdAt, 'MM.dd HH:mm')}">날짜</span>
+                </a>
+            </div>
+
+            <div th:if="${recentQuestions == null or recentQuestions.isEmpty()}"
+                 class="empty-msg">등록된 질문이 없습니다.</div>
+
+        </div>
+
+        <!-- ===== 우측: 사이드바 ===== -->
+        <aside class="home-side">
+
+            <!-- 로그인 박스 (비로그인) -->
+            <div class="login-box" sec:authorize="isAnonymous()">
+                <div class="login-head">로그인</div>
+
+                <!--
+                    Spring Security 기본 로그인 폼
+                    action URL은 1번 팀원 SecurityConfig와 맞춰야 함
+                -->
+                <form th:action="@{/login}" method="post">
+
+                    <input type="text" name="username" placeholder="아이디"
+                           class="login-input" autocomplete="username">
+
+                    <div class="pw-wrap">
+                        <input type="password" id="pw-input" name="password"
+                               placeholder="비밀번호"
+                               class="login-input"
+                               autocomplete="current-password">
+                        <button type="button" class="pw-toggle"
+                                id="pw-toggle"
+                                aria-label="비밀번호 표시 전환">
+                            <i class="bi bi-eye-slash" id="pw-icon"></i>
+                        </button>
+                    </div>
+
+                    <!-- 로그인 실패 메시지 -->
+                    <div th:if="${param.error}" class="login-error">
+                        아이디 또는 비밀번호가 올바르지 않습니다.
+                    </div>
+
+                    <button type="submit" class="login-btn">로그인</button>
+                </form>
+
+                <div class="login-links">
+                    <a th:href="@{/members/find-account}">계정 찾기</a>
+                    <span>|</span>
+                    <a th:href="@{/member/signup}">회원가입</a>
+                </div>
+            </div>
+
+            <!-- 로그인 후 프로필 박스 -->
+            <div class="user-box" sec:authorize="isAuthenticated()">
+                <div class="user-row">
+                    <div class="user-avatar">프로필<br>사진</div>
+                    <span class="user-name"
+                          sec:authentication="name">닉네임</span>
+                    <form th:action="@{/logout}" method="post" style="margin:0">
+                        <button type="submit" class="logout-btn">로그아웃</button>
+                    </form>
+                </div>
+                <a th:href="@{/mypage}" class="mypage-link">
+                    마이페이지
+                    <!--
+                        알림 있을 때만 빨간 점 표시
+                        hasNotification은 1번 팀원 Controller에서 모델로 전달
+                    -->
+                    <span th:if="${hasNotification}" class="notif-dot"></span>
+                </a>
+            </div>
+
+            <!-- 인기 랭킹 -->
+            <div class="rank-box">
+                <div class="rank-title">인기 랭킹</div>
+                <div th:if="${rankingList != null and !rankingList.isEmpty()}">
+                    <div th:each="item, stat : ${rankingList}"
+                         class="rank-item">
+                    <span class="rank-num"
+                          th:text="${stat.count} + '.'">1.</span>
+                        <span class="rank-name"
+                              th:text="${item.name}">닉네임</span>
+                        <span class="rank-heart">
+                        ♥ <span th:text="${item.likeCount}">0</span>
+                    </span>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+    </div>
+
+</th:block>
+</body>
+</html>

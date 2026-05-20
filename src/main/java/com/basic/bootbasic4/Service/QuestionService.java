@@ -10,12 +10,19 @@ import com.basic.bootbasic4.entity.Member;
 import com.basic.bootbasic4.entity.Question;
 import com.basic.bootbasic4.entity.QuestionCategory;
 import com.basic.bootbasic4.entity.QuestionPetType;
+import com.basic.bootbasic4.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -27,40 +34,46 @@ public class QuestionService {
 
     // 1. 게시글 등록
     @Transactional
-    public Long addQuestion(QuestionRequestDto dto, Member member) {
+    public Long addQuestion(QuestionRequestDto dto, String username) {
+
+        if (username == null) {
+            throw new IllegalArgumentException(ErrorCode.MEMBER_NOT_LOGGED_IN.getMessage());
+        }
+
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        int nextBoardSeq = questionRepository.findMaxBoardSeqByCategory(dto.getCategory()) + 1;
+
         Question question = dto.toEntity();
         question.setMember(member);
+        question.setBoardSeq(nextBoardSeq);
+
         return questionRepository.save(question).getId();
     }
 
-    // 2. 게시판별 질문 목록 (카테고리 + petType 필터)
-    public Page<QuestionResponseDto> getListByCategory(String category, String petType, Pageable pageable) {
-        QuestionCategory categoryEnum = QuestionCategory.valueOf(category.toUpperCase());
-
-        Page<Question> questions;
-        if (petType == null || petType.equalsIgnoreCase("ALL")) {
-            questions = questionRepository.findByCategory(categoryEnum, pageable);
-        } else {
-            QuestionPetType petTypeEnum = QuestionPetType.valueOf(petType.toUpperCase());
-            questions = questionRepository.findByCategoryAndPetType(categoryEnum, petTypeEnum, pageable);
-        }
-        return questions.map(QuestionResponseDto::from);
-    }
 
     // 3. 상세 조회 + 조회수 증가
     @Transactional
     public QuestionResponseDto getQuestionDetail(Long id) {
-        Question question = questionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + id));
         questionRepository.increaseViewCount(id);
+
+        Question question = findQuestionById(id);
+
         return QuestionResponseDto.from(question);
     }
 
+
     // 4. 게시글 수정
     @Transactional
-    public void updateQuestion(Long id, QuestionRequestDto dto) {
-        Question question = questionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + id));
+    public void updateQuestion(Long id, QuestionRequestDto dto, String currentUsername) {
+
+        Question question = findQuestionById(id);
+
+        if (!question.getMember().getUsername().equals(currentUsername)) {
+            throw new IllegalArgumentException(ErrorCode.QUESTION_UNAUTHORIZED.getMessage());
+        }
+
         question.setTitle(dto.getTitle());
         question.setContent(dto.getContent());
         question.setCategory(dto.getCategory());
@@ -68,19 +81,52 @@ public class QuestionService {
         question.setPetType(dto.getPetType());
     }
 
+
     // 5. 게시글 삭제
     @Transactional
-    public void deleteQuestion(Long id) {
-        Question question = questionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + id));
+    public void deleteQuestion(Long id, String currentUsername) {
+        Question question = findQuestionById(id);
+
+        if (!question.getMember().getUsername().equals(currentUsername)) {
+            throw new IllegalArgumentException(ErrorCode.QUESTION_UNAUTHORIZED.getMessage());
+        }
+
         questionRepository.delete(question);
     }
 
     // 6. 검색 + 필터 + 페이징 (Specification 기반)
-    public Page<QuestionSummaryDto> search(String keyword, QuestionCategory category, QuestionPetType petType, Pageable pageable) {
-        Specification<Question> spec = QuestionSpecification.withCondition(keyword, category, petType);
+    public Page<QuestionSummaryDto> search(String keyword, String searchType, QuestionCategory category, QuestionPetType petType, Pageable pageable) {
+        Specification<Question> spec = QuestionSpecification.withCondition(keyword, searchType, category, petType);
         return questionRepository.findAll(spec, pageable)
                 .map(QuestionSummaryDto::from);
     }
 
+
+    // ID로 게시글 찾기(예외 처리)
+    private Question findQuestionById(Long id) {
+        return questionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(ErrorCode.QUESTION_NOT_FOUND.getMessage()));
+    }
+
+    // answercontroller에서 사용(질문 엔티티반환)
+    public Question getQuestion(Long id) {
+        return questionRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(ErrorCode.QUESTION_NOT_FOUND.getMessage()));
+    }
+
+    // 메인 페이지 - 최근 질문 5개
+    public List<QuestionSummaryDto> getRecentQuestions() {
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("createdAt").descending());
+        return questionRepository.findAll(pageable)
+                .map(QuestionSummaryDto::from)
+                .getContent();
+    }
+
+    // 메인 페이지 - 인기 게시물 3개 (조회수순)
+    public List<QuestionSummaryDto> getPopularPosts() {
+        Pageable pageable = PageRequest.of(0, 3, Sort.by("viewCount").descending());
+        return questionRepository.findAll(pageable)
+                .map(QuestionSummaryDto::from)
+                .getContent();
+    }
 }

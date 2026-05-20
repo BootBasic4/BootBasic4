@@ -19,15 +19,30 @@
 
         <div class="mb-3">
             <label class="form-label fw-bold">게시판 카테고리</label>
-            <select th:field="*{category}" class="form-select">
+
+            <select th:if="${questionId == null}" th:field="*{category}" class="form-select">
                 <option value="QUESTION">질문게시판</option>
-                <option value="ADOPT">분양게시판</option>
+                <option value="ADOPTION">분양게시판</option>
                 <option value="TIP">꿀팁게시판</option>
                 <option value="SHARE">나눔게시판</option>
                 <option value="FREE">자유게시판</option>
             </select>
+
+            <div th:unless="${questionId == null}">
+                <select class="form-select bg-light text-muted" disabled>
+                    <option value="QUESTION" th:selected="${#strings.toString(dto.category) == 'QUESTION'}">질문게시판</option>
+                    <option value="ADOPTION" th:selected="${#strings.toString(dto.category) == 'ADOPTION'}">분양게시판</option>
+                    <option value="TIP"      th:selected="${#strings.toString(dto.category) == 'TIP'}">꿀팁게시판</option>
+                    <option value="SHARE"    th:selected="${#strings.toString(dto.category) == 'SHARE'}">나눔게시판</option>
+                    <option value="FREE"     th:selected="${#strings.toString(dto.category) == 'FREE'}">자유게시판</option>
+                </select>
+
+                <input type="hidden" name="category" th:value="${dto.category}">
+            </div>
+
             <div class="error-msg" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></div>
         </div>
+
 
         <div class="mb-3">
             <label class="form-label fw-bold">반려동물 종류</label>
