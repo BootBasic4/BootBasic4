@@ -103,12 +103,30 @@ public class QuestionController {
         return "redirect:/questions/detail/" + id;
     }
 
+
     // (추가) @GetMapping {question_form.html}
     @GetMapping("/edit/{question_id}")
     public String editForm(@PathVariable("question_id") Long id, Model model) {
-        QuestionResponseDto dto = questionService.getQuestionDetail(id);
-        model.addAttribute("dto", dto);
+
+        QuestionResponseDto responseDto = questionService.getQuestionDetail(id);
+        QuestionRequestDto requestDto = new QuestionRequestDto();
+
+
+        requestDto.setTitle(responseDto.getTitle());
+        requestDto.setContent(responseDto.getContent());
+        requestDto.setImageUrl(responseDto.getImageUrl());
+
+        if (responseDto.getCategory() != null) {
+            requestDto.setCategory(QuestionCategory.valueOf(responseDto.getCategory().toString().toUpperCase()));
+        }
+
+        if (responseDto.getPetType() != null) {
+            requestDto.setPetType(QuestionPetType.valueOf(responseDto.getPetType().toString().toUpperCase()));
+        }
+
+        model.addAttribute("dto", requestDto);
         model.addAttribute("questionId", id);
+
         return "question/question_form";
     }
 
@@ -154,6 +172,7 @@ public class QuestionController {
     public String list(
             @PathVariable String category,
             @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "TITLE_CONTENT") String searchType,
             @RequestParam(defaultValue = "ALL") String petType,
             @RequestParam(defaultValue = "createdAt") String sort,
             @RequestParam(defaultValue = "desc") String direction,
@@ -174,13 +193,15 @@ public class QuestionController {
         QuestionPetType petTypeEnum = QuestionPetType.valueOf(petType.toUpperCase());
 
         Pageable pageable = PageRequest.of(page, size, sortObj);
-        Page<QuestionSummaryDto> questions = questionService.search(keyword, categoryEnum, petTypeEnum, pageable);
+        Page<QuestionSummaryDto> questions = questionService.search(keyword, searchType, categoryEnum, petTypeEnum, pageable);
 
 
         model.addAttribute("questions", questions);
         model.addAttribute("category", category.toUpperCase());
+        model.addAttribute("categoryEnum", categoryEnum);
         model.addAttribute("petType", petType.toUpperCase());
         model.addAttribute("keyword", keyword);
+        model.addAttribute("searchType", searchType);
         model.addAttribute("sort", sort);
         model.addAttribute("direction", direction);
         model.addAttribute("categories", QuestionCategory.values());

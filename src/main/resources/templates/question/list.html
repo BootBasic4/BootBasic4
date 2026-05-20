@@ -14,6 +14,7 @@
         .sidebar a.active { color: #4e73df; font-weight: bold; }
         .post-table thead { border-bottom: 2px solid #333; }
         .search-container { background-color: #f8f9fa; padding: 20px; border-radius: 8px; }
+        mark { background-color: #fff3cd; color: #856404; padding: 0 2px; border-radius: 2px; }
     </style>
 </head>
 <body>
@@ -39,7 +40,7 @@
 
             <!-- 검색/필터 폼 -->
             <form th:action="@{/questions/{category}(category=${category})}" method="get" class="row g-2 mb-3">
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <select class="form-select" name="petType" onchange="this.form.submit()">
                         <option value="ALL" th:selected="${petType == 'ALL'}">동물 전체</option>
                         <option th:each="pt : ${petTypes}"
@@ -49,9 +50,16 @@
                                 th:selected="${pt.name() == petType}">동물</option>
                     </select>
                 </div>
-                <div class="col-md-7">
+                <div class="col-md-2">
+                    <select class="form-select" name="searchType">
+                        <option value="TITLE_CONTENT" th:selected="${searchType == 'TITLE_CONTENT'}">제목+내용</option>
+                        <option value="TITLE"         th:selected="${searchType == 'TITLE'}">제목</option>
+                        <option value="CONTENT"       th:selected="${searchType == 'CONTENT'}">내용</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
                     <input type="text" class="form-control" name="keyword"
-                           th:value="${keyword}" placeholder="제목 또는 내용 검색">
+                           th:value="${keyword}" placeholder="검색어를 입력하세요">
                 </div>
                 <div class="col-md-2">
                     <button type="submit" class="btn btn-primary w-100">
@@ -69,13 +77,13 @@
                 </span>
                 <div class="d-flex gap-2 align-items-center">
                     <div class="btn-group btn-group-sm">
-                        <a th:href="@{/questions/{category}(category=${category},keyword=${keyword},petType=${petType},sort='createdAt',direction='desc',page=0)}"
+                        <a th:href="@{/questions/{category}(category=${category},keyword=${keyword},searchType=${searchType},petType=${petType},sort='createdAt',direction='desc',page=0)}"
                            class="btn btn-outline-secondary"
                            th:classappend="${sort == 'createdAt' and direction == 'desc'} ? ' active'">최신순</a>
-                        <a th:href="@{/questions/{category}(category=${category},keyword=${keyword},petType=${petType},sort='createdAt',direction='asc',page=0)}"
+                        <a th:href="@{/questions/{category}(category=${category},keyword=${keyword},searchType=${searchType},petType=${petType},sort='createdAt',direction='asc',page=0)}"
                            class="btn btn-outline-secondary"
                            th:classappend="${sort == 'createdAt' and direction == 'asc'} ? ' active'">오래된순</a>
-                        <a th:href="@{/questions/{category}(category=${category},keyword=${keyword},petType=${petType},sort='viewCount',direction='desc',page=0)}"
+                        <a th:href="@{/questions/{category}(category=${category},keyword=${keyword},searchType=${searchType},petType=${petType},sort='viewCount',direction='desc',page=0)}"
                            class="btn btn-outline-secondary"
                            th:classappend="${sort == 'viewCount'} ? ' active'">조회순</a>
                     </div>
@@ -103,7 +111,7 @@
                         <td colspan="6" class="text-center text-muted py-5">등록된 게시글이 없습니다.</td>
                     </tr>
                     <tr th:each="q : ${questions.content}">
-                        <td class="text-muted small" th:text="${q.id}"></td>
+                        <td class="text-muted small" th:text="${q.boardSeq}"></td>
                         <td>
                             <span class="badge bg-light text-dark border"
                                   th:text="${q.petType.label}">동물</span>
@@ -111,7 +119,7 @@
                         <td>
                             <a th:href="@{/questions/detail/{id}(id=${q.id})}"
                                th:text="${q.title}"
-                               class="text-decoration-none text-dark fw-semibold">제목</a>
+                               class="text-decoration-none text-dark fw-semibold post-title">제목</a>
                         </td>
                         <td class="text-center text-muted" th:text="${q.nickname}"></td>
                         <td class="small text-muted" th:text="${q.viewCount}"></td>
@@ -127,25 +135,35 @@
                 <ul class="pagination justify-content-center">
                     <li class="page-item" th:classappend="${questions.first} ? ' disabled'">
                         <a class="page-link"
-                           th:href="@{/questions/{category}(category=${category},page=${questions.number - 1},keyword=${keyword},petType=${petType},sort=${sort},direction=${direction})}">&laquo;</a>
+                           th:href="@{/questions/{category}(category=${category},page=${questions.number - 1},keyword=${keyword},searchType=${searchType},petType=${petType},sort=${sort},direction=${direction})}">&laquo;</a>
                     </li>
                     <li th:each="i : ${#numbers.sequence(0, questions.totalPages - 1)}"
                         th:if="${i >= questions.number - 4 and i <= questions.number + 4}"
                         class="page-item"
                         th:classappend="${i == questions.number} ? ' active'">
                         <a class="page-link"
-                           th:href="@{/questions/{category}(category=${category},page=${i},keyword=${keyword},petType=${petType},sort=${sort},direction=${direction})}"
+                           th:href="@{/questions/{category}(category=${category},page=${i},keyword=${keyword},searchType=${searchType},petType=${petType},sort=${sort},direction=${direction})}"
                            th:text="${i + 1}">1</a>
                     </li>
                     <li class="page-item" th:classappend="${questions.last} ? ' disabled'">
                         <a class="page-link"
-                           th:href="@{/questions/{category}(category=${category},page=${questions.number + 1},keyword=${keyword},petType=${petType},sort=${sort},direction=${direction})}">&raquo;</a>
+                           th:href="@{/questions/{category}(category=${category},page=${questions.number + 1},keyword=${keyword},searchType=${searchType},petType=${petType},sort=${sort},direction=${direction})}">&raquo;</a>
                     </li>
                 </ul>
             </nav>
         </main>
     </div>
 </div>
+<span id="searchKeyword" th:attr="data-keyword=${keyword}" style="display:none"></span>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const keyword = document.getElementById('searchKeyword').dataset.keyword;
+    if (keyword) {
+        const pattern = new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+        document.querySelectorAll('.post-title').forEach(el => {
+            el.innerHTML = el.textContent.replace(pattern, match => `<mark>${match}</mark>`);
+        });
+    }
+</script>
 </body>
 </html>

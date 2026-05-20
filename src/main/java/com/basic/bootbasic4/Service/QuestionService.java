@@ -40,8 +40,11 @@ public class QuestionService {
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
+        int nextBoardSeq = questionRepository.findMaxBoardSeqByCategory(dto.getCategory()) + 1;
+
         Question question = dto.toEntity();
         question.setMember(member);
+        question.setBoardSeq(nextBoardSeq);
 
         return questionRepository.save(question).getId();
     }
@@ -89,8 +92,8 @@ public class QuestionService {
     }
 
     // 6. 검색 + 필터 + 페이징 (Specification 기반)
-    public Page<QuestionSummaryDto> search(String keyword, QuestionCategory category, QuestionPetType petType, Pageable pageable) {
-        Specification<Question> spec = QuestionSpecification.withCondition(keyword, category, petType);
+    public Page<QuestionSummaryDto> search(String keyword, String searchType, QuestionCategory category, QuestionPetType petType, Pageable pageable) {
+        Specification<Question> spec = QuestionSpecification.withCondition(keyword, searchType, category, petType);
         return questionRepository.findAll(spec, pageable)
                 .map(QuestionSummaryDto::from);
     }
