@@ -47,6 +47,8 @@ public class AnswerController {
             List<Answer> answers = answerService.getAnswersByQuestionId(questionId);
             model.addAttribute("question", question);
             model.addAttribute("answers", answers);
+            model.addAttribute("isReported", false);
+            model.addAttribute("reportedAnswerIds", List.of());
             return "question/detail";
         }
 
