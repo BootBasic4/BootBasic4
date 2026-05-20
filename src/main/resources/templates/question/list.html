@@ -1,169 +1,126 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout/base}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>커뮤니티 - [[${category}]]</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        /* 레퍼런스 스타일 반영 */
-        .sidebar { border-right: 1px solid #eee; min-height: 100vh; }
-        .sidebar a { color: #555; text-decoration: none; padding: 10px 15px; display: block; }
-        .sidebar a:hover { background-color: #f8f9fa; color: #000; }
-        .sidebar a.active { color: #4e73df; font-weight: bold; }
-        .post-table thead { border-bottom: 2px solid #333; }
-        .search-container { background-color: #f8f9fa; padding: 20px; border-radius: 8px; }
-        mark { background-color: #fff3cd; color: #856404; padding: 0 2px; border-radius: 2px; }
-    </style>
+    <title th:text="${category} + ' - 멍냥위키'">게시판</title>
 </head>
 <body>
-<div class="container-fluid">
-    <div class="row">
-        <!-- 사이드바 -->
-        <nav class="col-md-2 d-none d-md-block sidebar bg-light">
-            <div class="position-sticky pt-4">
-                <h2 class="px-3 mb-3 fw-bold">멍냥위키</h2>
-                <a th:href="@{/questions/QUESTION}" th:classappend="${category == 'QUESTION'} ? ' active'">질문게시판</a>
-                <a th:href="@{/questions/ADOPTION}" th:classappend="${category == 'ADOPTION'} ? ' active'">분양게시판</a>
-                <a th:href="@{/questions/TIP}" th:classappend="${category == 'TIP'} ? ' active'">꿀팁게시판</a>
-                <a th:href="@{/questions/SHARE}" th:classappend="${category == 'SHARE'} ? ' active'">나눔게시판</a>
-                <a th:href="@{/questions/FREE}" th:classappend="${category == 'FREE'} ? ' active'">자유게시판</a>
+<th:block layout:fragment="content">
+    <div class="page-wrap">
+
+        <h2 class="bd-title" th:text="${category}">게시판 이름</h2>
+
+        <!-- 검색 폼 -->
+        <form th:action="@{/questions/{category}(category=${category})}" method="get" class="bd-search">
+            <select class="bd-sel" name="petType">
+                <option value="ALL" th:selected="${petType == 'ALL'}">동물 전체</option>
+                <option th:each="pt : ${petTypes}"
+                        th:if="${pt.name() != 'ALL'}"
+                        th:value="${pt.name()}"
+                        th:text="${pt.label}"
+                        th:selected="${pt.name() == petType}">동물</option>
+            </select>
+            <select class="bd-sel" name="searchType">
+                <option value="TITLE_CONTENT" th:selected="${searchType == 'TITLE_CONTENT'}">제목+내용</option>
+                <option value="TITLE"         th:selected="${searchType == 'TITLE'}">제목</option>
+                <option value="CONTENT"       th:selected="${searchType == 'CONTENT'}">내용</option>
+            </select>
+            <input type="text" class="bd-key" name="keyword"
+                   th:value="${keyword}" placeholder="검색어를 입력하세요">
+            <button type="submit" class="bd-btn">
+                <i class="bi bi-search"></i> 검색
+            </button>
+            <input type="hidden" name="sort"      th:value="${sort}">
+            <input type="hidden" name="direction" th:value="${direction}">
+        </form>
+
+        <!-- 툴바 -->
+        <div class="bd-toolbar">
+        <span class="bd-count">
+            총 <strong th:text="${questions.totalElements}">0</strong>건
+        </span>
+            <div class="bd-actions">
+                <div class="sort-group">
+                    <a th:href="@{/questions/{category}(category=${category},keyword=${keyword},searchType=${searchType},petType=${petType},sort='createdAt',direction='desc',page=0)}"
+                       class="sort-btn" th:classappend="${sort == 'createdAt' and direction == 'desc'} ? ' on'">최신순</a>
+                    <a th:href="@{/questions/{category}(category=${category},keyword=${keyword},searchType=${searchType},petType=${petType},sort='createdAt',direction='asc',page=0)}"
+                       class="sort-btn" th:classappend="${sort == 'createdAt' and direction == 'asc'} ? ' on'">오래된순</a>
+                    <a th:href="@{/questions/{category}(category=${category},keyword=${keyword},searchType=${searchType},petType=${petType},sort='viewCount',direction='desc',page=0)}"
+                       class="sort-btn" th:classappend="${sort == 'viewCount'} ? ' on'">조회순</a>
+                </div>
+                <a th:href="@{/questions/add(category=${category})}"
+                   class="write-btn" sec:authorize="isAuthenticated()">
+                    <i class="bi bi-pencil-square"></i> 글쓰기
+                </a>
             </div>
+        </div>
+
+        <!-- 카드 리스트 -->
+        <div class="post-list">
+            <div th:if="${questions.content.isEmpty()}" class="post-empty">
+                등록된 게시글이 없습니다.
+            </div>
+            <a th:each="q : ${questions.content}"
+               th:href="@{/questions/detail/{id}(id=${q.id})}"
+               class="post-row">
+                <div class="post-thumb">
+                    <img th:if="${q.imageUrl != null}"
+                         th:src="${q.imageUrl}" th:alt="${q.title}"
+                         onerror="this.parentNode.dataset.empty='true'">
+                </div>
+                <div class="post-mid">
+                    <div class="post-top">
+                        <span class="pet-tag" th:text="${q.petType.label}">동물</span>
+                        <span class="td-muted" th:text="'#' + ${q.boardSeq}"></span>
+                    </div>
+                    <div class="post-title post-title-link" th:text="${q.title}">제목</div>
+                    <div class="post-meta">
+                        <span th:text="${q.nickname}">작성자</span>
+                        <span>조회 <span th:text="${q.viewCount}">0</span></span>
+                        <span th:text="${#temporals.format(q.createdAt, 'MM-dd HH:mm')}">날짜</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <nav th:if="${questions.totalPages > 1}" class="board-pagination">
+            <ul>
+                <li th:classappend="${questions.first} ? 'disabled'">
+                    <a th:href="@{/questions/{category}(category=${category},page=${questions.number - 1},keyword=${keyword},searchType=${searchType},petType=${petType},sort=${sort},direction=${direction})}">&laquo;</a>
+                </li>
+                <li th:each="i : ${#numbers.sequence(0, questions.totalPages - 1)}"
+                    th:if="${i >= questions.number - 4 and i <= questions.number + 4}"
+                    th:classappend="${i == questions.number} ? 'on'">
+                    <a th:href="@{/questions/{category}(category=${category},page=${i},keyword=${keyword},searchType=${searchType},petType=${petType},sort=${sort},direction=${direction})}"
+                       th:text="${i + 1}">1</a>
+                </li>
+                <li th:classappend="${questions.last} ? 'disabled'">
+                    <a th:href="@{/questions/{category}(category=${category},page=${questions.number + 1},keyword=${keyword},searchType=${searchType},petType=${petType},sort=${sort},direction=${direction})}">&raquo;</a>
+                </li>
+            </ul>
         </nav>
 
-        <!-- 메인 -->
-        <main class="col-md-10 ms-sm-auto px-md-4">
-            <div class="pt-4 pb-2 mb-3 border-bottom">
-                <h2 class="h3 fw-bold" th:text="${category}">게시판 이름</h2>
-            </div>
-
-            <!-- 검색/필터 폼 -->
-            <form th:action="@{/questions/{category}(category=${category})}" method="get" class="row g-2 mb-3">
-                <div class="col-md-2">
-                    <select class="form-select" name="petType" onchange="this.form.submit()">
-                        <option value="ALL" th:selected="${petType == 'ALL'}">동물 전체</option>
-                        <option th:each="pt : ${petTypes}"
-                                th:if="${pt.name() != 'ALL'}"
-                                th:value="${pt.name()}"
-                                th:text="${pt.label}"
-                                th:selected="${pt.name() == petType}">동물</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <select class="form-select" name="searchType">
-                        <option value="TITLE_CONTENT" th:selected="${searchType == 'TITLE_CONTENT'}">제목+내용</option>
-                        <option value="TITLE"         th:selected="${searchType == 'TITLE'}">제목</option>
-                        <option value="CONTENT"       th:selected="${searchType == 'CONTENT'}">내용</option>
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <input type="text" class="form-control" name="keyword"
-                           th:value="${keyword}" placeholder="검색어를 입력하세요">
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="bi bi-search"></i> 검색
-                    </button>
-                </div>
-                <input type="hidden" name="sort" th:value="${sort}">
-                <input type="hidden" name="direction" th:value="${direction}">
-            </form>
-
-            <!-- 결과 요약 + 정렬 + 글쓰기 -->
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="text-muted small">
-                    총 <strong th:text="${questions.totalElements}">0</strong>건
-                </span>
-                <div class="d-flex gap-2 align-items-center">
-                    <div class="btn-group btn-group-sm">
-                        <a th:href="@{/questions/{category}(category=${category},keyword=${keyword},searchType=${searchType},petType=${petType},sort='createdAt',direction='desc',page=0)}"
-                           class="btn btn-outline-secondary"
-                           th:classappend="${sort == 'createdAt' and direction == 'desc'} ? ' active'">최신순</a>
-                        <a th:href="@{/questions/{category}(category=${category},keyword=${keyword},searchType=${searchType},petType=${petType},sort='createdAt',direction='asc',page=0)}"
-                           class="btn btn-outline-secondary"
-                           th:classappend="${sort == 'createdAt' and direction == 'asc'} ? ' active'">오래된순</a>
-                        <a th:href="@{/questions/{category}(category=${category},keyword=${keyword},searchType=${searchType},petType=${petType},sort='viewCount',direction='desc',page=0)}"
-                           class="btn btn-outline-secondary"
-                           th:classappend="${sort == 'viewCount'} ? ' active'">조회순</a>
-                    </div>
-                    <a th:href="@{/questions/add(category=${category})}" class="btn btn-sm btn-success">
-                        <i class="bi bi-pencil-square"></i> 글쓰기
-                    </a>
-                </div>
-            </div>
-
-            <!-- 목록 테이블 -->
-            <div class="table-responsive">
-                <table class="table post-table table-hover align-middle">
-                    <thead class="table-light">
-                    <tr>
-                        <th style="width:60px">번호</th>
-                        <th style="width:80px">동물</th>
-                        <th>제목</th>
-                        <th style="width:100px" class="text-center">작성자</th>
-                        <th style="width:55px">조회</th>
-                        <th style="width:110px">작성일</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:if="${questions.content.isEmpty()}">
-                        <td colspan="6" class="text-center text-muted py-5">등록된 게시글이 없습니다.</td>
-                    </tr>
-                    <tr th:each="q : ${questions.content}">
-                        <td class="text-muted small" th:text="${q.boardSeq}"></td>
-                        <td>
-                            <span class="badge bg-light text-dark border"
-                                  th:text="${q.petType.label}">동물</span>
-                        </td>
-                        <td>
-                            <a th:href="@{/questions/detail/{id}(id=${q.id})}"
-                               th:text="${q.title}"
-                               class="text-decoration-none text-dark fw-semibold post-title">제목</a>
-                        </td>
-                        <td class="text-center text-muted" th:text="${q.nickname}"></td>
-                        <td class="small text-muted" th:text="${q.viewCount}"></td>
-                        <td class="small text-muted"
-                            th:text="${#temporals.format(q.createdAt, 'MM-dd HH:mm')}"></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- 페이지네이션 -->
-            <nav th:if="${questions.totalPages > 1}" class="mt-4">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item" th:classappend="${questions.first} ? ' disabled'">
-                        <a class="page-link"
-                           th:href="@{/questions/{category}(category=${category},page=${questions.number - 1},keyword=${keyword},searchType=${searchType},petType=${petType},sort=${sort},direction=${direction})}">&laquo;</a>
-                    </li>
-                    <li th:each="i : ${#numbers.sequence(0, questions.totalPages - 1)}"
-                        th:if="${i >= questions.number - 4 and i <= questions.number + 4}"
-                        class="page-item"
-                        th:classappend="${i == questions.number} ? ' active'">
-                        <a class="page-link"
-                           th:href="@{/questions/{category}(category=${category},page=${i},keyword=${keyword},searchType=${searchType},petType=${petType},sort=${sort},direction=${direction})}"
-                           th:text="${i + 1}">1</a>
-                    </li>
-                    <li class="page-item" th:classappend="${questions.last} ? ' disabled'">
-                        <a class="page-link"
-                           th:href="@{/questions/{category}(category=${category},page=${questions.number + 1},keyword=${keyword},searchType=${searchType},petType=${petType},sort=${sort},direction=${direction})}">&raquo;</a>
-                    </li>
-                </ul>
-            </nav>
-        </main>
     </div>
-</div>
-<span id="searchKeyword" th:attr="data-keyword=${keyword}" style="display:none"></span>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    const keyword = document.getElementById('searchKeyword').dataset.keyword;
-    if (keyword) {
-        const pattern = new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-        document.querySelectorAll('.post-title').forEach(el => {
-            el.innerHTML = el.textContent.replace(pattern, match => `<mark>${match}</mark>`);
-        });
-    }
-</script>
+
+    <!-- 검색어 하이라이트용 hidden span -->
+    <span id="searchKeyword" th:attr="data-keyword=${keyword}" style="display:none"></span>
+
+</th:block>
+
+<th:block layout:fragment="scripts">
+    <script>
+        const keyword = document.getElementById('searchKeyword').dataset.keyword;
+        if (keyword) {
+            const pattern = new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+            document.querySelectorAll('.post-title-link').forEach(el => {
+                el.innerHTML = el.textContent.replace(pattern, match => `<mark>${match}</mark>`);
+            });
+        }
+    </script>
+</th:block>
 </body>
 </html>

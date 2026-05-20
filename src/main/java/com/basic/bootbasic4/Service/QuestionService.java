@@ -13,12 +13,15 @@ import com.basic.bootbasic4.entity.QuestionPetType;
 import com.basic.bootbasic4.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -109,5 +112,21 @@ public class QuestionService {
     public Question getQuestion(Long id) {
         return questionRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(ErrorCode.QUESTION_NOT_FOUND.getMessage()));
+    }
+
+    // 메인 페이지 - 최근 질문 5개
+    public List<QuestionSummaryDto> getRecentQuestions() {
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("createdAt").descending());
+        return questionRepository.findAll(pageable)
+                .map(QuestionSummaryDto::from)
+                .getContent();
+    }
+
+    // 메인 페이지 - 인기 게시물 3개 (조회수순)
+    public List<QuestionSummaryDto> getPopularPosts() {
+        Pageable pageable = PageRequest.of(0, 3, Sort.by("viewCount").descending());
+        return questionRepository.findAll(pageable)
+                .map(QuestionSummaryDto::from)
+                .getContent();
     }
 }

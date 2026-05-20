@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+
+<header th:fragment="navbar" class="site-header">
+    <div class="nav-top">
+
+        <!-- 로고 -->
+        <a th:href="@{/}" class="site-logo">멍냥위키</a>
+
+        <!-- 카테고리 메뉴 -->
+        <nav class="nav-center" aria-label="주요 메뉴">
+            <a th:href="@{/questions/QUESTION}" class="cat-nav">질문게시판</a>
+            <a th:href="@{/questions/ADOPTION}" class="cat-nav">분양</a>
+            <a th:href="@{/questions/TIP}"      class="cat-nav">꿀팁 게시판</a>
+            <a th:href="@{/questions/SHARE}"    class="cat-nav">애완용품 나눔</a>
+            <a th:href="@{/questions/FREE}"     class="cat-nav">자유게시판</a>
+        </nav>
+
+        <!-- 검색 + 로그인/닉네임 -->
+        <div class="nav-right-wrap">
+
+            <!-- 검색창 -->
+            <form th:action="@{/questions/QUESTION}" method="get" class="nav-search" role="search">
+                <i class="bi bi-search" aria-hidden="true"></i>
+                <input type="text" name="keyword" placeholder="검색어 입력"
+                       th:value="${keyword}" aria-label="검색">
+            </form>
+
+            <!-- 비로그인 -->
+            <div class="nav-auth" sec:authorize="isAnonymous()">
+                <a th:href="@{/login}">로그인</a>
+            </div>
+
+            <!-- 로그인 상태 -->
+            <div class="nav-auth" sec:authorize="isAuthenticated()">
+                <span sec:authentication="name" class="nav-nickname"></span>
+                <span class="nav-divider">|</span>
+                <form th:action="@{/logout}" method="post" style="display:inline">
+                    <button type="submit" class="nav-logout-btn">로그아웃</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</header>
+
+</body>
+</html>
