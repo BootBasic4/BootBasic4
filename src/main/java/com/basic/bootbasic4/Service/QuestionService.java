@@ -40,8 +40,11 @@ public class QuestionService {
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
+        int nextBoardSeq = questionRepository.findMaxBoardSeqByCategory(dto.getCategory()) + 1;
+
         Question question = dto.toEntity();
         question.setMember(member);
+        question.setBoardSeq(nextBoardSeq);
 
         return questionRepository.save(question).getId();
     }

@@ -103,12 +103,30 @@ public class QuestionController {
         return "redirect:/questions/detail/" + id;
     }
 
+
     // (추가) @GetMapping {question_form.html}
     @GetMapping("/edit/{question_id}")
     public String editForm(@PathVariable("question_id") Long id, Model model) {
-        QuestionResponseDto dto = questionService.getQuestionDetail(id);
-        model.addAttribute("dto", dto);
+
+        QuestionResponseDto responseDto = questionService.getQuestionDetail(id);
+        QuestionRequestDto requestDto = new QuestionRequestDto();
+
+
+        requestDto.setTitle(responseDto.getTitle());
+        requestDto.setContent(responseDto.getContent());
+        requestDto.setImageUrl(responseDto.getImageUrl());
+
+        if (responseDto.getCategory() != null) {
+            requestDto.setCategory(QuestionCategory.valueOf(responseDto.getCategory().toString().toUpperCase()));
+        }
+
+        if (responseDto.getPetType() != null) {
+            requestDto.setPetType(QuestionPetType.valueOf(responseDto.getPetType().toString().toUpperCase()));
+        }
+
+        model.addAttribute("dto", requestDto);
         model.addAttribute("questionId", id);
+
         return "question/question_form";
     }
 
