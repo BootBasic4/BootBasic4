@@ -195,7 +195,6 @@ public class QuestionController {
         Pageable pageable = PageRequest.of(page, size, sortObj);
         Page<QuestionSummaryDto> questions = questionService.search(keyword, searchType, categoryEnum, petTypeEnum, pageable);
 
-
         model.addAttribute("questions", questions);
         model.addAttribute("category", category.toUpperCase());
         model.addAttribute("categoryEnum", categoryEnum);
