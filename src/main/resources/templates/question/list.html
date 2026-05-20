@@ -38,15 +38,15 @@
             </div>
 
             <!-- 검색/필터 폼 -->
-            <form th:action="@{/questions}" method="get" class="row g-2 mb-3">
-                <input type="hidden" name="category" th:value="${category}">
+            <form th:action="@{/questions/{category}(category=${category})}" method="get" class="row g-2 mb-3">
                 <div class="col-md-3">
-                    <select class="form-select" name="petType">
-                        <option value="" th:selected="${petType == null}">동물 전체</option>
+                    <select class="form-select" name="petType" onchange="this.form.submit()">
+                        <option value="ALL" th:selected="${petType == 'ALL'}">동물 전체</option>
                         <option th:each="pt : ${petTypes}"
+                                th:if="${pt.name() != 'ALL'}"
                                 th:value="${pt.name()}"
-                                th:text="${pt.name()}"
-                                th:selected="${pt == petType}">동물</option>
+                                th:text="${pt.label}"
+                                th:selected="${pt.name() == petType}">동물</option>
                     </select>
                 </div>
                 <div class="col-md-7">
@@ -69,13 +69,13 @@
                 </span>
                 <div class="d-flex gap-2 align-items-center">
                     <div class="btn-group btn-group-sm">
-                        <a th:href="@{/questions(category=${category},keyword=${keyword},petType=${petType},sort='createdAt',direction='desc',page=0)}"
+                        <a th:href="@{/questions/{category}(category=${category},keyword=${keyword},petType=${petType},sort='createdAt',direction='desc',page=0)}"
                            class="btn btn-outline-secondary"
                            th:classappend="${sort == 'createdAt' and direction == 'desc'} ? ' active'">최신순</a>
-                        <a th:href="@{/questions(category=${category},keyword=${keyword},petType=${petType},sort='createdAt',direction='asc',page=0)}"
+                        <a th:href="@{/questions/{category}(category=${category},keyword=${keyword},petType=${petType},sort='createdAt',direction='asc',page=0)}"
                            class="btn btn-outline-secondary"
                            th:classappend="${sort == 'createdAt' and direction == 'asc'} ? ' active'">오래된순</a>
-                        <a th:href="@{/questions(category=${category},keyword=${keyword},petType=${petType},sort='viewCount',direction='desc',page=0)}"
+                        <a th:href="@{/questions/{category}(category=${category},keyword=${keyword},petType=${petType},sort='viewCount',direction='desc',page=0)}"
                            class="btn btn-outline-secondary"
                            th:classappend="${sort == 'viewCount'} ? ' active'">조회순</a>
                     </div>
@@ -106,7 +106,7 @@
                         <td class="text-muted small" th:text="${q.id}"></td>
                         <td>
                             <span class="badge bg-light text-dark border"
-                                  th:text="${q.petType}">동물</span>
+                                  th:text="${q.petType.label}">동물</span>
                         </td>
                         <td>
                             <a th:href="@{/questions/detail/{id}(id=${q.id})}"
@@ -127,19 +127,19 @@
                 <ul class="pagination justify-content-center">
                     <li class="page-item" th:classappend="${questions.first} ? ' disabled'">
                         <a class="page-link"
-                           th:href="@{/questions(page=${questions.number - 1},category=${category},keyword=${keyword},petType=${petType},sort=${sort},direction=${direction})}">&laquo;</a>
+                           th:href="@{/questions/{category}(category=${category},page=${questions.number - 1},keyword=${keyword},petType=${petType},sort=${sort},direction=${direction})}">&laquo;</a>
                     </li>
                     <li th:each="i : ${#numbers.sequence(0, questions.totalPages - 1)}"
                         th:if="${i >= questions.number - 4 and i <= questions.number + 4}"
                         class="page-item"
                         th:classappend="${i == questions.number} ? ' active'">
                         <a class="page-link"
-                           th:href="@{/questions(page=${i},category=${category},keyword=${keyword},petType=${petType},sort=${sort},direction=${direction})}"
+                           th:href="@{/questions/{category}(category=${category},page=${i},keyword=${keyword},petType=${petType},sort=${sort},direction=${direction})}"
                            th:text="${i + 1}">1</a>
                     </li>
                     <li class="page-item" th:classappend="${questions.last} ? ' disabled'">
                         <a class="page-link"
-                           th:href="@{/questions(page=${questions.number + 1},category=${category},keyword=${keyword},petType=${petType},sort=${sort},direction=${direction})}">&raquo;</a>
+                           th:href="@{/questions/{category}(category=${category},page=${questions.number + 1},keyword=${keyword},petType=${petType},sort=${sort},direction=${direction})}">&raquo;</a>
                     </li>
                 </ul>
             </nav>
