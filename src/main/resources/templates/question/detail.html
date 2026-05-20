@@ -84,12 +84,14 @@
 
     <div class="d-flex justify-content-end gap-2 mt-5">
         <a th:href="@{/questions/{cat}(cat=${question.category})}" class="btn btn-outline-secondary">목록으로</a>
-        <a th:href="@{/questions/edit/{id}(id=${question.id})}" class="btn btn-light border">수정</a>
-        <form th:action="@{/questions/delete/{id}(id=${question.id})}" method="post">
+        <a th:if="${#authentication.name == question.username}"
+           th:href="@{/questions/edit/{id}(id=${question.id})}" class="btn btn-light border">수정</a>
+        <form th:if="${#authentication.name == question.username}"
+              th:action="@{/questions/delete/{id}(id=${question.id})}" method="post">
             <input type="hidden" name="category" th:value="${question.category}">
             <button type="submit" class="btn btn-danger" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</button>
         </form>
-        <button th:if="${!isReported}"
+        <button th:if="${!isReported and #authentication.name != question.username}"
                 sec:authorize="isAuthenticated()"
                 type="button"
                 class="btn btn-outline-danger"
@@ -160,68 +162,67 @@
                                 onclick="return confirm('정말 삭제하시겠습니까?')">삭제
                         </button>
                     </form>
-
-                    <!-- 로그인한 사용자만 댓글 신고 가능 -->
-                    <button th:if="${!reportedAnswerIds.contains(answer.answerId)}"
-                            sec:authorize="isAuthenticated()"
-                            type="button"
-                            class="btn btn-sm btn-outline-danger"
-                            data-bs-toggle="modal"
-                            th:attr="data-bs-target='#answerReportModal' + ${answer.answerId}">
-                        신고
-                    </button>
-                    <span th:if="${reportedAnswerIds.contains(answer.answerId)}"
-                          class="badge bg-warning text-dark align-self-center">
+                </div>
+                <!-- 로그인한 사용자만 댓글 신고 가능 -->
+                <button th:if="${!reportedAnswerIds.contains(answer.answerId)
+                                and #authentication.name != answer.member.username}"
+                        sec:authorize="isAuthenticated()"
+                        type="button"
+                        class="btn btn-sm btn-outline-danger"
+                        data-bs-toggle="modal"
+                        th:attr="data-bs-target='#answerReportModal' + ${answer.answerId}">
+                    신고
+                </button>
+                <span th:if="${reportedAnswerIds.contains(answer.answerId)}"
+                      class="badge bg-warning text-dark align-self-center">
                         신고 처리중
                     </span>
-                    <!-- 댓글 신고 모달 -->
-                    <div sec:authorize="isAuthenticated()"
-                         class="modal fade"
-                         th:id="'answerReportModal' + ${answer.answerId}"
-                         tabindex="-1">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
+                <!-- 댓글 신고 모달 -->
+                <div sec:authorize="isAuthenticated()"
+                     class="modal fade"
+                     th:id="'answerReportModal' + ${answer.answerId}"
+                     tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
 
-                                <form th:action="@{/answers/{answerId}/report(answerId=${answer.answerId})}"
-                                      method="post">
+                            <form th:action="@{/answers/{answerId}/report(answerId=${answer.answerId})}"
+                                  method="post">
 
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">댓글 신고</h5>
-                                        <button type="button"
-                                                class="btn-close"
-                                                data-bs-dismiss="modal"></button>
-                                    </div>
+                                <div class="modal-header">
+                                    <h5 class="modal-title">댓글 신고</h5>
+                                    <button type="button"
+                                            class="btn-close"
+                                            data-bs-dismiss="modal"></button>
+                                </div>
 
-                                    <div class="modal-body">
+                                <div class="modal-body">
                                     <textarea name="reason"
                                               class="form-control"
                                               rows="4"
                                               placeholder="신고 사유를 입력해주세요."
                                               required></textarea>
 
-                                        <input type="hidden"
-                                               name="questionId"
-                                               th:value="${question.id}">
-                                    </div>
+                                    <input type="hidden"
+                                           name="questionId"
+                                           th:value="${question.id}">
+                                </div>
 
-                                    <div class="modal-footer">
-                                        <button type="button"
-                                                class="btn btn-secondary"
-                                                data-bs-dismiss="modal">
-                                            취소
-                                        </button>
+                                <div class="modal-footer">
+                                    <button type="button"
+                                            class="btn btn-secondary"
+                                            data-bs-dismiss="modal">
+                                        취소
+                                    </button>
 
-                                        <button type="submit"
-                                                class="btn btn-danger">
-                                            신고 완료
-                                        </button>
-                                    </div>
+                                    <button type="submit"
+                                            class="btn btn-danger">
+                                        신고 완료
+                                    </button>
+                                </div>
 
-                                </form>
-                            </div>
+                            </form>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
