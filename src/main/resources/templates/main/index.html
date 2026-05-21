@@ -53,7 +53,7 @@
             <div class="recent-list"
                  th:if="${recentQuestions != null and !recentQuestions.isEmpty()}">
                 <a th:each="q : ${recentQuestions}"
-                   th:href="@{/questions/{id}(id=${q.id})}"
+                   th:href="@{/questions/detail/{id}(id=${q.id})}"
                    class="recent-item">
                     <span class="recent-txt" th:text="${q.title}">제목</span>
                     <span class="recent-time"
@@ -149,6 +149,21 @@
         </aside>
     </div>
 
+</th:block>
+<!-- 패스워드 토글 -->
+</th:block>
+<th:block layout:fragment="scripts">
+    <script>
+        var toggle = document.getElementById('pw-toggle');
+        if(toggle) {
+            toggle.addEventListener('click', function(){
+                var inp = document.getElementById('pw-input');
+                var ico = document.getElementById('pw-icon');
+                if(inp.type === 'password'){ inp.type = 'text'; ico.className = 'bi bi-eye'; }
+                else { inp.type = 'password'; ico.className = 'bi bi-eye-slash'; }
+            });
+        }
+    </script>
 </th:block>
 </body>
 </html>
