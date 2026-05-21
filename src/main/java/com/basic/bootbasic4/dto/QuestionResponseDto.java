@@ -34,7 +34,7 @@ public class QuestionResponseDto {
                 .id(question.getId())
                 .title(question.getTitle())
                 .content(question.getContent())
-                .category(question.getCategory().name())
+                .category(question.getCategory().getLabel())
                 .petType(question.getPetType().name())
                 .imageUrl(question.getImageUrl())
                 .viewCount(question.getViewCount())
