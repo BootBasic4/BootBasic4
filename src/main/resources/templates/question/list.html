@@ -15,7 +15,7 @@
 
         <!-- 검색 폼 -->
         <form th:action="@{/questions/{category}(category=${category})}" method="get" class="bd-search">
-            <select class="bd-sel" name="petType">
+            <select class="bd-sel" name="petType" onchange="this.form.submit()">
                 <option value="ALL" th:selected="${petType == 'ALL'}">전체</option>
                 <option th:each="pt : ${petTypes}"
                         th:if="${pt.name() != 'ALL'}"
