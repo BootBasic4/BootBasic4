@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum QuestionPetType {
-    ALL("동물 전체"),
+    ALL("전체"),
     DOG("강아지"),
     CAT("고양이");
 
