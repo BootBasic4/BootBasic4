@@ -19,22 +19,23 @@ public class QuestionResponseDto {
     private String title;
     private String content;
     private String category;
+    private String categoryLabel;
     private String petType;
     private String imageUrl;
     private Integer viewCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private String nickname; // 작성자 이름
-    private String username; // 작성자 아이디 추가
-    private Integer commentCount; // 답글 수
-
+    private String nickname;
+    private String username;
+    private Integer commentCount;
 
     public static QuestionResponseDto from(Question question) {
         return QuestionResponseDto.builder()
                 .id(question.getId())
                 .title(question.getTitle())
                 .content(question.getContent())
-                .category(question.getCategory().getLabel())
+                .category(question.getCategory().name())
+                .categoryLabel(question.getCategory().getLabel())
                 .petType(question.getPetType().name())
                 .imageUrl(question.getImageUrl())
                 .viewCount(question.getViewCount())
@@ -43,6 +44,5 @@ public class QuestionResponseDto {
                 .username(question.getMember().getUsername())
                 .commentCount(question.getAnswers() != null ? question.getAnswers().size() : 0)
                 .build();
-
     }
 }
