@@ -205,6 +205,7 @@ public class QuestionController {
         model.addAttribute("direction", direction);
         model.addAttribute("categories", QuestionCategory.values());
         model.addAttribute("petTypes", QuestionPetType.values());
+        model.addAttribute("categoryEnum", categoryEnum);
 
         return "question/list";
     }
