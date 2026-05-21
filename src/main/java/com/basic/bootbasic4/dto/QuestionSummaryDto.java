@@ -13,7 +13,8 @@ public record QuestionSummaryDto(
     QuestionPetType petType,
     int viewCount,
     LocalDateTime createdAt,
-    String nickname
+    String nickname,
+    int answerCount
 ) {
     public static QuestionSummaryDto from(Question question) {
         return new QuestionSummaryDto(
@@ -24,7 +25,8 @@ public record QuestionSummaryDto(
                 question.getPetType(),
                 question.getViewCount(),
                 question.getCreatedAt(),
-                question.getMember() != null ? question.getMember().getNickname() : null  // 추가
+                question.getMember() != null ? question.getMember().getNickname() : null,
+                question.getAnswers() != null ? question.getAnswers().size() : 0
         );
     }
 }

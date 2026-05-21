@@ -640,6 +640,7 @@ textarea.form-control { resize: vertical; }
 .post-top { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
 .pet-tag { font-size: 11px; background: #eef0fb; color: #3a47a8; border-radius: 10px; padding: 2px 8px; white-space: nowrap; }
 .post-title { font-size: 15px; font-weight: 600; color: #222; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.post-title .answer-count { font-size: 13px; font-weight: 600; color: #e06c0a; margin-left: 4px; }
 .post-row:hover .post-title { color: #5a6acf; }
 .post-meta { font-size: 12px; color: #999; display: flex; gap: 12px; }
 
