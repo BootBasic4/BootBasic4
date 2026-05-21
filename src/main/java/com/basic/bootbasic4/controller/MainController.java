@@ -12,10 +12,12 @@ public class MainController {
 
     private final QuestionService questionService;
 
+
     @GetMapping({"/", "/index"})
     public String index(Model model) {
         model.addAttribute("popularPosts",    questionService.getPopularPosts());
         model.addAttribute("recentQuestions", questionService.getRecentQuestions());
+        model.addAttribute("isIndex", true);
         return "main/index";
     }
 }
