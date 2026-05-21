@@ -11,7 +11,7 @@
 <th:block layout:fragment="content">
     <div class="page-wrap">
 
-        <h2 class="bd-title" th:text="${category}">게시판 이름</h2>
+        <h2 class="bd-title" th:text="${categoryEnum.label}">게시판 이름</h2>
 
         <!-- 검색 폼 -->
         <form th:action="@{/questions/{category}(category=${category})}" method="get" class="bd-search">

@@ -35,12 +35,18 @@
             </div>
 
             <!-- 로그인 상태 -->
+            <!-- 로그인 상태 -->
             <div class="nav-auth" sec:authorize="isAuthenticated()">
-                <span sec:authentication="name" class="nav-nickname"></span>
-                <span class="nav-divider">|</span>
-                <form th:action="@{/logout}" method="post" style="display:inline">
-                    <button type="submit" class="nav-logout-btn">로그아웃</button>
-                </form>
+                <!-- index에서는 name/로그아웃 숨김 -->
+                <th:block th:unless="${isIndex}">
+                    <span sec:authentication="name" class="nav-nickname"></span>
+                    <span class="nav-divider">|</span>
+                    <form th:action="@{/logout}" method="post" style="display:inline">
+                        <button type="submit" class="nav-logout-btn">로그아웃</button>
+                    </form>
+                    <span class="nav-divider">|</span>
+                    <a th:href="@{/mypage}" class="nav-logout-btn">마이페이지</a>
+                </th:block>
             </div>
 
         </div>
