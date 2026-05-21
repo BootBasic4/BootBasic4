@@ -78,7 +78,10 @@
                         <span class="pet-tag" th:text="${q.petType != null ? q.petType.label : ''}"></span>
                         <span class="td-muted" th:text="'#' + ${q.boardSeq}"></span>
                     </div>
-                    <div class="post-title post-title-link" th:text="${q.title}">제목</div>
+                    <div class="post-title post-title-link">
+                        <span th:text="${q.title}">제목</span>
+                        <span th:if="${q.answerCount > 0}" class="answer-count" th:text="'[' + ${q.answerCount} + ']'"></span>
+                    </div>
                     <div class="post-meta">
                         <span th:text="${q.nickname}">작성자</span>
                         <span>조회 <span th:text="${q.viewCount}">0</span></span>
@@ -118,7 +121,7 @@
         const keyword = document.getElementById('searchKeyword').dataset.keyword;
         if (keyword) {
             const pattern = new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-            document.querySelectorAll('.post-title-link').forEach(el => {
+            document.querySelectorAll('.post-title-link > span:first-child').forEach(el => {
                 el.innerHTML = el.textContent.replace(pattern, match => `<mark>${match}</mark>`);
             });
         }
