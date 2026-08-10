@@ -1,4 +1,4 @@
-# <div align="center"> 🐾 멍냥위키 (mnwiki) </div>
+# <div align="center"> 🐾 멍냥위키 </div>
 
 > ### 멍냥위키 레포지토리
 > 애완동물 Q&A 커뮤니티 웹 서비스 <br>
